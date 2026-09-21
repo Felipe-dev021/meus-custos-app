@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { cores } from '@/tema';
+import { ProvedorFinanceiro } from '@/estado/ContextoFinanceiro';
 
 const temaNavegacao = {
   ...DarkTheme,
@@ -22,7 +23,9 @@ export default function LayoutRaiz() {
     <SafeAreaProvider>
       <ThemeProvider value={temaNavegacao}>
         <StatusBar style="light" />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: cores.fundo } }} />
+        <ProvedorFinanceiro>
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: cores.fundo } }} />
+        </ProvedorFinanceiro>
       </ThemeProvider>
     </SafeAreaProvider>
   );
