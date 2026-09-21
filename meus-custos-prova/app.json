@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Meus Custos",
+    "slug": "meus-custos-prova",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "meuscustosprova",
+    "userInterfaceStyle": "automatic",
+    "web": { "output": "static" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}
