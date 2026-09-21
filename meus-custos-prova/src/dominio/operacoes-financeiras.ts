@@ -112,3 +112,62 @@ export function pagarDespesa(
   calcularResumoFinanceiro(lancamentos);
   return { ...dados, lancamentos };
 }
+
+/** Atualiza a parcela e cria sua despesa na mesma operação, sem estado intermediário. */
+export function pagarParcela(
+  dados: DadosFinanceiros,
+  dividaId: string,
+  parcelaId: string,
+  dataPagamento: DataCivil,
+  hoje = paraDataCivil(new Date()),
+): DadosFinanceiros {
+  validarDataPagamento(dataPagamento, hoje);
+  const divida = dados.dividas.find((item) => item.id === dividaId);
+  if (!divida) throw new Error('Dívida não encontrada.');
+  const parcela = divida.parcelas.find((item) => item.id === parcelaId);
+  if (!parcela) throw new Error('Parcela não encontrada nesta dívida.');
+
+  const despesasVinculadas = dados.lancamentos.filter((item) =>
+    item.tipo === 'despesa' && item.origem.tipo === 'parcela'
+    && item.origem.dividaId === dividaId && item.origem.parcelaId === parcelaId);
+
+  if (parcela.situacao === 'paga') {
+    const despesa = despesasVinculadas[0];
+    if (despesasVinculadas.length !== 1 || despesa.tipo !== 'despesa'
+      || despesa.id !== parcela.despesaId || despesa.situacao !== 'paga'
+      || despesa.valorCentavos !== parcela.valorCentavos
+      || despesa.dataPagamento !== parcela.dataPagamento
+      || despesa.categoria !== divida.categoria) {
+      throw new Error('O pagamento da parcela está inconsistente com a despesa vinculada.');
+    }
+    return dados;
+  }
+  if (despesasVinculadas.length > 0) {
+    throw new Error('Esta parcela pendente já possui uma despesa vinculada.');
+  }
+
+  // Cada par dívida/parcela tem um identificador estável, inclusive após reabrir o app.
+  const despesaId = `parcela:${encodeURIComponent(dividaId)}:${encodeURIComponent(parcelaId)}`;
+  const comDespesa = cadastrarLancamento(dados, {
+    tipo: 'despesa',
+    descricao: `${divida.descricao} · Parcela ${parcela.numero} de ${divida.parcelas.length}`,
+    valorCentavos: parcela.valorCentavos,
+    categoria: divida.categoria,
+    data: dataPagamento,
+    situacao: 'paga',
+  }, despesaId, hoje);
+
+  return {
+    ...comDespesa,
+    lancamentos: comDespesa.lancamentos.map((item): Lancamento =>
+      item.id === despesaId && item.tipo === 'despesa'
+        ? { ...item, origem: { tipo: 'parcela', dividaId, parcelaId } }
+        : item),
+    dividas: dados.dividas.map((item) => item.id === dividaId ? {
+      ...item,
+      parcelas: item.parcelas.map((itemParcela) => itemParcela.id === parcelaId ? {
+        ...itemParcela, situacao: 'paga', dataPagamento, despesaId,
+      } : itemParcela),
+    } : item),
+  };
+}
