@@ -1,56 +1,56 @@
 import { StyleSheet, View } from 'react-native';
 
-import { AppText } from '@/components/AppText';
-import { Brand } from '@/components/Brand';
-import { Card } from '@/components/Card';
-import { Screen } from '@/components/Screen';
-import { colors, radii, spacing } from '@/theme';
+import { Texto } from '@/componentes/Texto';
+import { Marca } from '@/componentes/Marca';
+import { Cartao } from '@/componentes/Cartao';
+import { Tela } from '@/componentes/Tela';
+import { cores, raios, espacamentos } from '@/tema';
 
-export default function IndexScreen() {
+export default function TelaInicial() {
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <Brand />
+    <Tela contentContainerStyle={estilos.conteudo}>
+      <Marca />
 
-      <View style={styles.intro}>
-        <View style={styles.badge}>
-          <AppText variant="caption" tone="primary">PROTÓTIPO MOBILE</AppText>
+      <View style={estilos.apresentacao}>
+        <View style={estilos.selo}>
+          <Texto variante="legenda" tom="primaria">PROTÓTIPO MOBILE</Texto>
         </View>
-        <AppText variant="title" accessibilityRole="header">
+        <Texto variante="titulo" accessibilityRole="header">
           Clareza para cuidar do seu dinheiro.
-        </AppText>
-        <AppText tone="secondary">
+        </Texto>
+        <Texto tom="secundaria">
           Mais organização no presente. Mais tranquilidade para o futuro.
-        </AppText>
+        </Texto>
       </View>
 
-      <Card>
-        <AppText variant="heading" accessibilityRole="header">Tudo em um só lugar</AppText>
-        <AppText tone="secondary">
+      <Cartao>
+        <Texto variante="subtitulo" accessibilityRole="header">Tudo em um só lugar</Texto>
+        <Texto tom="secundaria">
           Receitas, despesas e planejamento com a simplicidade que sua rotina precisa.
-        </AppText>
-        <View style={styles.divider} />
-        <AppText variant="caption" tone="secondary">
+        </Texto>
+        <View style={estilos.divisor} />
+        <Texto variante="legenda" tom="secundaria">
           Esta é a apresentação visual do aplicativo. As funcionalidades serão adicionadas nas próximas etapas.
-        </AppText>
-      </Card>
+        </Texto>
+      </Cartao>
 
-      <AppText variant="caption" tone="secondary" style={styles.footer}>
+      <Texto variante="legenda" tom="secundaria" style={estilos.rodape}>
         Meus Custos · Seu controle financeiro pessoal
-      </AppText>
-    </Screen>
+      </Texto>
+    </Tela>
   );
 }
 
-const styles = StyleSheet.create({
-  content: { paddingTop: spacing.xxl, gap: spacing.xxl },
-  intro: { gap: spacing.lg, paddingTop: spacing.xl },
-  badge: {
+const estilos = StyleSheet.create({
+  conteudo: { paddingTop: espacamentos.amplo, gap: espacamentos.amplo },
+  apresentacao: { gap: espacamentos.grande, paddingTop: espacamentos.extraGrande },
+  selo: {
     alignSelf: 'flex-start',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.pill,
-    backgroundColor: colors.primarySoft,
+    paddingHorizontal: espacamentos.medio,
+    paddingVertical: espacamentos.minimo,
+    borderRadius: raios.capsula,
+    backgroundColor: cores.primariaSuave,
   },
-  divider: { height: 1, backgroundColor: colors.border, marginVertical: spacing.xs },
-  footer: { marginTop: 'auto', paddingTop: spacing.xl },
+  divisor: { height: 1, backgroundColor: cores.borda, marginVertical: espacamentos.minimo },
+  rodape: { marginTop: 'auto', paddingTop: espacamentos.extraGrande },
 });

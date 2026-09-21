@@ -2,49 +2,49 @@ import type { PropsWithChildren } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
-import { colors, spacing } from '@/theme';
+import { cores, espacamentos } from '@/tema';
 
-type ScreenProps = PropsWithChildren<{
-  scroll?: boolean;
+type PropriedadesTela = PropsWithChildren<{
+  rolagem?: boolean;
   edges?: Edge[];
   contentContainerStyle?: StyleProp<ViewStyle>;
 }>;
 
-export function Screen({
+export function Tela({
   children,
-  scroll = true,
+  rolagem = true,
   edges = ['top', 'right', 'bottom', 'left'],
   contentContainerStyle,
-}: ScreenProps) {
+}: PropriedadesTela) {
   return (
-    <SafeAreaView style={styles.screen} edges={edges}>
+    <SafeAreaView style={estilos.tela} edges={edges}>
       <KeyboardAvoidingView
-        style={styles.flex}
+        style={estilos.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        {scroll ? (
+        {rolagem ? (
           <ScrollView
-            contentContainerStyle={[styles.content, contentContainerStyle]}
+            contentContainerStyle={[estilos.conteudo, contentContainerStyle]}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag">
             {children}
           </ScrollView>
         ) : (
-          <View style={[styles.content, styles.flex, contentContainerStyle]}>{children}</View>
+          <View style={[estilos.conteudo, estilos.flex, contentContainerStyle]}>{children}</View>
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
+const estilos = StyleSheet.create({
+  tela: { flex: 1, backgroundColor: cores.fundo },
   flex: { flex: 1 },
-  content: {
+  conteudo: {
     flexGrow: 1,
     width: '100%',
     maxWidth: 640,
     alignSelf: 'center',
-    padding: spacing.xl,
-    gap: spacing.xl,
+    padding: espacamentos.extraGrande,
+    gap: espacamentos.extraGrande,
   },
 });

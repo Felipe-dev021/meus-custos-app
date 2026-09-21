@@ -2,27 +2,27 @@ import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { colors } from '@/theme';
+import { cores } from '@/tema';
 
-const navigationTheme = {
+const temaNavegacao = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: colors.primary,
-    background: colors.background,
-    card: colors.surface,
-    text: colors.text,
-    border: colors.border,
-    notification: colors.danger,
+    primary: cores.primaria,
+    background: cores.fundo,
+    card: cores.superficie,
+    text: cores.texto,
+    border: cores.borda,
+    notification: cores.perigo,
   },
 };
 
-export default function RootLayout() {
+export default function LayoutRaiz() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={navigationTheme}>
+      <ThemeProvider value={temaNavegacao}>
         <StatusBar style="light" />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: cores.fundo } }} />
       </ThemeProvider>
     </SafeAreaProvider>
   );
