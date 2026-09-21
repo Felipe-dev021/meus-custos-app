@@ -1,7 +1,8 @@
 # Meus Custos — protótipo mobile
 
 Projeto Expo com React Native, TypeScript e Expo Router.
-Estado inicial: uma tela vazia, sem as telas de exemplo do Expo.
+Tema escuro e componentes nativos reutilizáveis. A tela inicial apresenta a identidade visual;
+as telas e operações financeiras ainda serão implementadas.
 
 ```sh
 npm install
