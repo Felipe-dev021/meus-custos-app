@@ -1,4 +1,10 @@
-import { createContext, useContext, useMemo, useState, useSyncExternalStore, type PropsWithChildren } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore, type PropsWithChildren } from 'react';
+
+import { Botao } from '@/componentes/Botao';
+import { Tela } from '@/componentes/Tela';
+import { Texto } from '@/componentes/Texto';
+import { CHAVE_DADOS } from '@/dados/persistencia';
 
 import { calcularGastosPorCategoria, calcularResumoFinanceiro, listarReceitas, listarUltimosLancamentos } from '@/dominio/consultas-financeiras';
 import { criarEstadoFinanceiro } from '@/estado/estado-financeiro';
@@ -6,7 +12,24 @@ import { criarEstadoFinanceiro } from '@/estado/estado-financeiro';
 const ContextoFinanceiro = createContext<ReturnType<typeof criarEstadoFinanceiro> | null>(null);
 
 export function ProvedorFinanceiro({ children }: PropsWithChildren) {
-  const [central] = useState(() => criarEstadoFinanceiro());
+  const [central] = useState(() => criarEstadoFinanceiro(undefined, {
+    ler: () => AsyncStorage.getItem(CHAVE_DADOS),
+    gravar: (conteudo) => AsyncStorage.setItem(CHAVE_DADOS, conteudo),
+  }));
+  const estado = useSyncExternalStore(central.assinar, central.obterEstado, central.obterEstado);
+  useEffect(() => { void central.iniciar(); }, [central]);
+
+  if (!estado.carregado || estado.erroArmazenamento) {
+    return (
+      <Tela>
+        <Texto variante="subtitulo">{estado.erroArmazenamento ? 'Precisamos tentar novamente' : 'Carregando sua demonstração…'}</Texto>
+        {estado.erroArmazenamento && <>
+          <Texto tom="secundaria" accessibilityLiveRegion="polite">{estado.erroArmazenamento}</Texto>
+          <Botao titulo="Tentar novamente" onPress={() => { void central.tentarNovamente(); }} />
+        </>}
+      </Tela>
+    );
+  }
   return <ContextoFinanceiro.Provider value={central}>{children}</ContextoFinanceiro.Provider>;
 }
 

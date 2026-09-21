@@ -16,7 +16,9 @@ Verificações: `npm run typecheck`, `npm run lint` e `npm test` (Node.js 22.18+
 
 Os modelos ficam em `src/dominio`, os dados fictícios em `src/dados` e a formatação em
 `src/utilitarios`. Valores usam centavos inteiros e datas usam `AAAA-MM-DD`, sem horário.
-Os dados ainda não estão conectados às telas nem persistidos no aparelho.
+O estado compartilhado salva os dados financeiros e o perfil no aparelho com AsyncStorage.
+Não salva senha nem sessão; ao reabrir, será necessário entrar na demonstração novamente.
+As telas financeiras ainda serão conectadas ao estado. Falhas de armazenamento exibem uma opção de tentar novamente.
 
 As consultas de `src/dominio/consultas-financeiras.ts` calculam o saldo com receitas recebidas
 menos despesas pagas. A previsão desconta também as despesas pendentes cadastradas;

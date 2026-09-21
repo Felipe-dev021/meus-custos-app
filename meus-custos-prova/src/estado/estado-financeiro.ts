@@ -1,10 +1,14 @@
 import { criarDadosDemonstracao } from '../dados/demonstracao.ts';
+import { restaurarDados, serializarDados, type ArmazenamentoFinanceiro } from '../dados/persistencia.ts';
 import type { DadosFinanceiros, DataCivil, Perfil } from '../dominio/financeiro';
 import { cadastrarLancamento, pagarDespesa, pagarParcela, type NovoLancamento } from '../dominio/operacoes-financeiras.ts';
 
 export type EstadoFinanceiro = {
   dados: DadosFinanceiros;
   demonstracaoAtiva: boolean;
+  carregado: boolean;
+  salvando: boolean;
+  erroArmazenamento: string | null;
 };
 
 export type AcaoFinanceira =
@@ -55,21 +59,72 @@ function aplicarAcao(estado: EstadoFinanceiro, acao: AcaoFinanceira): EstadoFina
 }
 
 /** Uma instância por aplicativo. Sair da demonstração não apaga os dados. */
-export function criarEstadoFinanceiro(dados = criarDadosDemonstracao()) {
-  let estado: EstadoFinanceiro = { dados, demonstracaoAtiva: false };
+export function criarEstadoFinanceiro(dados = criarDadosDemonstracao(), armazenamento?: ArmazenamentoFinanceiro) {
+  let estado: EstadoFinanceiro = {
+    dados, demonstracaoAtiva: false, carregado: !armazenamento, salvando: false, erroArmazenamento: null,
+  };
   const ouvintes = new Set<() => void>();
+  let leitura: Promise<void> | null = null;
+  let fila = Promise.resolve();
+  let revisao = 0;
+
+  function publicar(proximo: EstadoFinanceiro) {
+    estado = proximo;
+    ouvintes.forEach((ouvinte) => ouvinte());
+  }
+
+  function gravar() {
+    if (!armazenamento) return Promise.resolve();
+    const conteudo = serializarDados(estado.dados);
+    const revisaoAtual = ++revisao;
+    publicar({ ...estado, salvando: true, erroArmazenamento: null });
+    fila = fila.then(() => armazenamento.gravar(conteudo)).then(() => {
+      if (revisaoAtual === revisao) publicar({ ...estado, salvando: false, erroArmazenamento: null });
+    }).catch(() => {
+      if (revisaoAtual === revisao) publicar({
+        ...estado, salvando: false,
+        erroArmazenamento: 'Não foi possível salvar no aparelho. Mantenha o aplicativo aberto e tente novamente.',
+      });
+    });
+    return fila;
+  }
+
+  function iniciar(): Promise<void> {
+    if (!armazenamento || estado.carregado) return fila;
+    if (leitura) return leitura;
+    publicar({ ...estado, erroArmazenamento: null });
+    leitura = (async () => {
+      try {
+        const conteudo = await armazenamento.ler();
+        const restaurados = conteudo === null ? estado.dados : restaurarDados(conteudo);
+        publicar({ ...estado, dados: restaurados, carregado: true, demonstracaoAtiva: false });
+        if (conteudo === null) await gravar();
+      } catch {
+        publicar({ ...estado, erroArmazenamento: 'Não foi possível carregar os dados salvos. Eles foram preservados. Tente novamente.' });
+      } finally {
+        leitura = null;
+      }
+    })();
+    return leitura;
+  }
 
   return {
     obterEstado: () => estado,
+    iniciar,
+    tentarNovamente: () => estado.carregado ? gravar() : iniciar(),
+    aguardarPersistencia: () => fila,
     assinar(ouvinte: () => void) {
       ouvintes.add(ouvinte);
       return () => { ouvintes.delete(ouvinte); };
     },
     executar(acao: AcaoFinanceira) {
+      if (!estado.carregado) throw new Error('Aguarde o carregamento dos dados.');
       const proximo = aplicarAcao(estado, acao);
       if (proximo === estado) return;
-      estado = proximo;
-      ouvintes.forEach((ouvinte) => ouvinte());
+      const dadosAlterados = proximo.dados !== estado.dados;
+      if (armazenamento && dadosAlterados) serializarDados(proximo.dados);
+      publicar(proximo);
+      if (dadosAlterados) void gravar();
     },
   };
 }
