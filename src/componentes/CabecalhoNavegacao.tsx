@@ -77,7 +77,7 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
             accessibilityLabel="Logo Meus Custos"
           />
           <Texto tom="primaria" style={estilos.logoTexto}>
-            {'meus\ncustos'}
+            {'Meus\nCustos'}
           </Texto>
         </Pressable>
 
@@ -133,7 +133,7 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
                   accessibilityLabel="Logo Meus Custos"
                 />
                 <Texto tom="primaria" style={estilos.logoTexto}>
-                  {'meus\ncustos'}
+                  {'Meus\nCustos'}
                 </Texto>
               </View>
             </View>

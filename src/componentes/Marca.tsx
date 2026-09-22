@@ -16,7 +16,7 @@ export function Marca() {
         accessibilityLabel="Ícone Meus Custos"
       />
       <Texto tom="primaria" style={estilos.assinatura}>
-        {'meus\ncustos'}
+        {'Meus\nCustos'}
       </Texto>
     </View>
   );
