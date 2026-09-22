@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -103,8 +104,9 @@ export default function TelaPerfil() {
             }
           }}
           style={estilos.botaoVoltar}>
+          <Ionicons name="arrow-back-outline" size={16} color={cores.primaria} />
           <Texto variante="rotulo" tom="primaria">
-            ← Voltar
+            Voltar
           </Texto>
         </Pressable>
 
@@ -182,9 +184,12 @@ export default function TelaPerfil() {
                 borderColor: cores.primaria,
               },
             ]}>
-            <Texto variante="rotulo" tom="primaria">
-              ✓ Perfil atualizado com sucesso!
-            </Texto>
+            <View style={estilos.conteudoSucesso}>
+              <Ionicons name="checkmark-circle-outline" size={18} color={cores.primaria} />
+              <Texto variante="rotulo" tom="primaria">
+                Perfil atualizado com sucesso!
+              </Texto>
+            </View>
           </View>
         )}
 
@@ -239,27 +244,36 @@ export default function TelaPerfil() {
 
         <View style={estilos.listaItensInfo}>
           <View style={estilos.itemInfo}>
-            <Texto variante="rotulo" tom="primaria">
-              🔒 Armazenamento Local
-            </Texto>
+            <View style={estilos.cabecalhoItemInfo}>
+              <Ionicons name="hardware-chip-outline" size={16} color={cores.primaria} />
+              <Texto variante="rotulo" tom="primaria">
+                Armazenamento Local
+              </Texto>
+            </View>
             <Texto variante="legenda" tom="secundaria" style={estilos.textoItemInfo}>
               Seus dados, lançamentos e configurações são salvos exclusivamente na memória deste aparelho.
             </Texto>
           </View>
 
           <View style={estilos.itemInfo}>
-            <Texto variante="rotulo" tom="primaria">
-              🛡 Privacidade e Segurança
-            </Texto>
+            <View style={estilos.cabecalhoItemInfo}>
+              <Ionicons name="shield-checkmark-outline" size={16} color={cores.primaria} />
+              <Texto variante="rotulo" tom="primaria">
+                Privacidade e Segurança
+              </Texto>
+            </View>
             <Texto variante="legenda" tom="secundaria" style={estilos.textoItemInfo}>
               Nenhuma credencial ou senha é enviada para a internet ou salva no sistema.
             </Texto>
           </View>
 
           <View style={estilos.itemInfo}>
-            <Texto variante="rotulo" tom="primaria">
-              ⚙ Versão do Aplicativo
-            </Texto>
+            <View style={estilos.cabecalhoItemInfo}>
+              <Ionicons name="information-circle-outline" size={16} color={cores.primaria} />
+              <Texto variante="rotulo" tom="primaria">
+                Versão do Aplicativo
+              </Texto>
+            </View>
             <Texto variante="legenda" tom="secundaria" style={estilos.textoItemInfo}>
               Meus Custos Mobile · Versão 1.0.0 (Demonstração)
             </Texto>
@@ -303,6 +317,9 @@ const estilos = StyleSheet.create({
   },
   botaoVoltar: {
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingVertical: espacamentos.minimo,
   },
   textosTitulo: {
@@ -354,6 +371,11 @@ const estilos = StyleSheet.create({
     borderRadius: raios.pequeno,
     borderWidth: 1,
   },
+  conteudoSucesso: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   botaoSalvar: {
     marginTop: espacamentos.pequeno,
   },
@@ -365,7 +387,12 @@ const estilos = StyleSheet.create({
     gap: espacamentos.grande,
   },
   itemInfo: {
-    gap: 2,
+    gap: 4,
+  },
+  cabecalhoItemInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   textoItemInfo: {
     lineHeight: 18,

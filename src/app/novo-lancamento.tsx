@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -169,10 +170,15 @@ export default function TelaNovoLancamento() {
               },
             ],
           ]}>
+          <Ionicons
+            name="trending-up-outline"
+            size={16}
+            color={tipo === 'receita' ? cores.primaria : cores.textoSecundario}
+          />
           <Texto
             variante="rotulo"
             tom={tipo === 'receita' ? 'primaria' : 'secundaria'}>
-            ↗ Receita
+            Receita
           </Texto>
         </Pressable>
 
@@ -191,10 +197,15 @@ export default function TelaNovoLancamento() {
               },
             ],
           ]}>
+          <Ionicons
+            name="card-outline"
+            size={16}
+            color={tipo === 'despesa' ? cores.primaria : cores.textoSecundario}
+          />
           <Texto
             variante="rotulo"
             tom={tipo === 'despesa' ? 'primaria' : 'secundaria'}>
-            ↙ Despesa
+            Despesa
           </Texto>
         </Pressable>
       </View>
@@ -287,10 +298,15 @@ export default function TelaNovoLancamento() {
                     backgroundColor: situacao === 'paga' ? cores.primariaSuave : cores.superficieElevada,
                   },
                 ]}>
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={16}
+                  color={situacao === 'paga' ? cores.primaria : cores.textoSecundario}
+                />
                 <Texto
                   variante="rotulo"
                   tom={situacao === 'paga' ? 'primaria' : 'secundaria'}>
-                  ✓ Já paga
+                  Já paga
                 </Texto>
               </Pressable>
 
@@ -306,10 +322,15 @@ export default function TelaNovoLancamento() {
                     backgroundColor: situacao === 'pendente' ? cores.primariaSuave : cores.superficieElevada,
                   },
                 ]}>
+                <Ionicons
+                  name="time-outline"
+                  size={16}
+                  color={situacao === 'pendente' ? cores.primaria : cores.textoSecundario}
+                />
                 <Texto
                   variante="rotulo"
                   tom={situacao === 'pendente' ? 'primaria' : 'secundaria'}>
-                  ⏳ Pendente
+                  Pendente
                 </Texto>
               </Pressable>
             </View>
@@ -354,9 +375,11 @@ const estilos = StyleSheet.create({
   },
   opcaoTipo: {
     flex: 1,
-    paddingVertical: espacamentos.medio,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
+    paddingVertical: espacamentos.medio,
     borderRadius: raios.pequeno - 2,
   },
   opcaoTipoAtiva: {
@@ -385,9 +408,11 @@ const estilos = StyleSheet.create({
   },
   opcaoSituacao: {
     flex: 1,
-    paddingVertical: espacamentos.medio,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
+    paddingVertical: espacamentos.medio,
     borderRadius: raios.pequeno,
     borderWidth: 1,
   },

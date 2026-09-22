@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useRef, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
@@ -114,9 +115,9 @@ export default function TelaAssistente() {
             borderColor: cores.borda,
           },
         ]}>
-        <Texto variante="legenda" style={estilos.iconeAviso}>
-          🤖
-        </Texto>
+        <View style={estilos.iconeAviso}>
+          <Ionicons name="sparkles-outline" size={18} color={cores.primaria} />
+        </View>
         <Texto variante="legenda" tom="secundaria" style={estilos.textoAvisoSimulado}>
           <Texto variante="legenda" tom="primaria" style={estilos.textoNegritoAviso}>
             Respostas simuladas locais:
@@ -202,7 +203,7 @@ export default function TelaAssistente() {
                 ]}>
                 {!ehUsuario && (
                   <View style={[estilos.avatarBot, { backgroundColor: cores.superficieElevada }]}>
-                    <Texto style={estilos.emojiAvatar}>🤖</Texto>
+                    <Ionicons name="sparkles" size={15} color={cores.primaria} />
                   </View>
                 )}
 
@@ -275,14 +276,11 @@ export default function TelaAssistente() {
                 opacity: textoEntrada.trim() ? 1 : 0.6,
               },
             ]}>
-            <Texto
-              variante="rotulo"
-              style={[
-                estilos.setaEnviar,
-                { color: textoEntrada.trim() ? cores.sobrePrimaria : cores.textoSecundario },
-              ]}>
-              ➤
-            </Texto>
+            <Ionicons
+              name="send"
+              size={15}
+              color={textoEntrada.trim() ? cores.sobrePrimaria : cores.textoSecundario}
+            />
           </Pressable>
         </View>
       </Cartao>
@@ -306,7 +304,8 @@ const estilos = StyleSheet.create({
     gap: espacamentos.medio,
   },
   iconeAviso: {
-    fontSize: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   textoAvisoSimulado: {
     flex: 1,

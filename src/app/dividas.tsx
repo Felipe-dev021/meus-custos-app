@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 
@@ -92,7 +93,11 @@ export default function TelaDividas() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>🏛</Texto>
+              <Ionicons
+                name="business-outline"
+                size={18}
+                color={resumoDividas.saldoDevedorTotal > 0 ? cores.perigo : cores.primaria}
+              />
             </View>
             <Texto variante="legenda" tom="secundaria">Saldo devedor total</Texto>
             <Texto
@@ -114,7 +119,7 @@ export default function TelaDividas() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>✓</Texto>
+              <Ionicons name="checkmark-circle-outline" size={18} color={cores.primaria} />
             </View>
             <Texto variante="legenda" tom="secundaria">Total já pago</Texto>
             <Texto
@@ -137,7 +142,7 @@ export default function TelaDividas() {
             },
           ]}>
           <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-            <Texto variante="rotulo" style={{ color: cores.texto }}>📊</Texto>
+            <Ionicons name="pie-chart-outline" size={18} color={cores.texto} />
           </View>
           <Texto variante="legenda" tom="secundaria">Dívidas quitadas</Texto>
           <Texto
@@ -225,15 +230,22 @@ export default function TelaDividas() {
                             borderColor: 'rgba(249, 156, 0, 0.3)',
                           },
                     ]}>
-                    <Texto
-                      variante="legenda"
-                      style={[
-                        estilos.textoBadgeDivida,
-                        { color: quitada ? cores.primaria : cores.aviso },
-                      ]}>
-                      {quitada ? '✓ QUITADA' : `${porcentagemPaga}% PAGO`}
-                    </Texto>
-                  </View>
+                      {quitada && (
+                        <Ionicons
+                          name="checkmark-circle-outline"
+                          size={12}
+                          color={cores.primaria}
+                        />
+                      )}
+                      <Texto
+                        variante="legenda"
+                        style={[
+                          estilos.textoBadgeDivida,
+                          { color: quitada ? cores.primaria : cores.aviso },
+                        ]}>
+                        {quitada ? 'QUITADA' : `${porcentagemPaga}% PAGO`}
+                      </Texto>
+                    </View>
                 </View>
 
                 {/* Resumo de Valores */}
@@ -327,19 +339,24 @@ export default function TelaDividas() {
 
                             {estaPaga ? (
                               <View
-                                style={[
-                                  estilos.badgeParcelaPaga,
-                                  {
-                                    backgroundColor: 'rgba(0, 255, 85, 0.1)',
-                                    borderColor: 'rgba(0, 255, 85, 0.3)',
-                                  },
-                                ]}>
-                                <Texto
-                                  variante="legenda"
-                                  style={[estilos.textoParcelaPaga, { color: cores.primaria }]}>
-                                  ✓ Paga
-                                </Texto>
-                              </View>
+                                  style={[
+                                    estilos.badgeParcelaPaga,
+                                    {
+                                      backgroundColor: 'rgba(0, 255, 85, 0.1)',
+                                      borderColor: 'rgba(0, 255, 85, 0.3)',
+                                    },
+                                  ]}>
+                                  <Ionicons
+                                    name="checkmark-circle-outline"
+                                    size={12}
+                                    color={cores.primaria}
+                                  />
+                                  <Texto
+                                    variante="legenda"
+                                    style={[estilos.textoParcelaPaga, { color: cores.primaria }]}>
+                                    Paga
+                                  </Texto>
+                                </View>
                             ) : (
                               <Pressable
                                 accessibilityRole="button"
@@ -534,6 +551,9 @@ const estilos = StyleSheet.create({
     fontSize: 11,
   },
   badgeSituacaoDivida: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: espacamentos.medio,
     paddingVertical: 4,
     borderRadius: raios.pequeno,
@@ -596,6 +616,9 @@ const estilos = StyleSheet.create({
     fontSize: 14,
   },
   badgeParcelaPaga: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: raios.pequeno,

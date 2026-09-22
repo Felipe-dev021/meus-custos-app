@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Image, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -22,12 +23,17 @@ type PropriedadesCabecalho = {
   rotaAtiva?: RotaAtiva;
 };
 
-const itensMenu: { id: RotaAtiva; rotulo: string; icone: string; caminho: string }[] = [
-  { id: 'visao-geral', rotulo: 'Dashboard', icone: '◫', caminho: '/(principal)/visao-geral' },
-  { id: 'receitas', rotulo: 'Receitas', icone: '↗', caminho: '/(principal)/receitas' },
-  { id: 'despesas', rotulo: 'Despesas', icone: '💳', caminho: '/(principal)/despesas' },
-  { id: 'dividas', rotulo: 'Dívidas', icone: '🏛', caminho: '/dividas' },
-  { id: 'assistente', rotulo: 'Assistente IA', icone: '🤖', caminho: '/assistente' },
+const itensMenu: {
+  id: RotaAtiva;
+  rotulo: string;
+  icone: keyof typeof Ionicons.glyphMap;
+  caminho: string;
+}[] = [
+  { id: 'visao-geral', rotulo: 'Dashboard', icone: 'grid-outline', caminho: '/(principal)/visao-geral' },
+  { id: 'receitas', rotulo: 'Receitas', icone: 'trending-up-outline', caminho: '/(principal)/receitas' },
+  { id: 'despesas', rotulo: 'Despesas', icone: 'card-outline', caminho: '/(principal)/despesas' },
+  { id: 'dividas', rotulo: 'Dívidas', icone: 'business-outline', caminho: '/dividas' },
+  { id: 'assistente', rotulo: 'Assistente IA', icone: 'sparkles-outline', caminho: '/assistente' },
 ];
 
 export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCabecalho) {
@@ -159,12 +165,12 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
                       estilos.itemLink,
                       ativo && { backgroundColor: cores.itemLinkAtivo },
                     ]}>
-                    <Texto
-                      variante="rotulo"
-                      tom={ativo ? 'primaria' : 'secundaria'}
-                      style={estilos.iconeLink}>
-                      {item.icone}
-                    </Texto>
+                    <Ionicons
+                      name={item.icone}
+                      size={20}
+                      color={ativo ? cores.primaria : cores.textoSecundario}
+                      style={estilos.iconeLink}
+                    />
                     <Texto
                       variante="rotulo"
                       tom={ativo ? 'primaria' : 'padrao'}
@@ -190,8 +196,13 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
                   borderColor: cores.borda,
                 },
               ]}>
-              <Texto variante="legenda" tom="secundaria" style={estilos.textoTema}>
-                {tema === 'escuro' ? '☼ Modo escuro ativo' : '☾ Modo claro ativo'}
+              <Ionicons
+                name={tema === 'escuro' ? 'moon-outline' : 'sunny-outline'}
+                size={18}
+                color={cores.primaria}
+              />
+              <Texto variante="rotulo" tom="secundaria" style={estilos.textoTema}>
+                {tema === 'escuro' ? 'Modo escuro ativo' : 'Modo claro ativo'}
               </Texto>
             </Pressable>
 
@@ -230,9 +241,11 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
                 disabled={salvando}
                 onPress={sairDemonstracao}
                 style={estilos.botaoSair}>
-                <Texto variante="rotulo" tom="secundaria">
-                  ↪
-                </Texto>
+                <Ionicons
+                  name="log-out-outline"
+                  size={20}
+                  color={cores.textoSecundario}
+                />
               </Pressable>
             </View>
           </View>
@@ -327,9 +340,9 @@ const estilos = StyleSheet.create({
     borderRadius: raios.pequeno,
   },
   iconeLink: {
-    fontSize: 18,
     width: 24,
-    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   textoLink: {},
   textoLinkAtivo: {
@@ -340,6 +353,9 @@ const estilos = StyleSheet.create({
     marginVertical: espacamentos.grande,
   },
   itemTema: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: espacamentos.medio,
     paddingHorizontal: espacamentos.medio,
     paddingVertical: espacamentos.medio,
     borderRadius: raios.pequeno,

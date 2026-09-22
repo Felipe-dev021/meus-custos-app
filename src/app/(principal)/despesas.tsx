@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -130,7 +131,7 @@ export default function TelaDespesas() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>💳</Texto>
+              <Ionicons name="card-outline" size={18} color={cores.texto} />
             </View>
             <Texto variante="legenda" tom="secundaria">Total de despesas</Texto>
             <Texto
@@ -151,7 +152,7 @@ export default function TelaDespesas() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>✓</Texto>
+              <Ionicons name="checkmark-circle-outline" size={18} color={cores.primaria} />
             </View>
             <Texto variante="legenda" tom="secundaria">Despesas pagas</Texto>
             <Texto
@@ -173,7 +174,7 @@ export default function TelaDespesas() {
             },
           ]}>
           <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-            <Texto variante="rotulo" style={{ color: cores.texto }}>⏳</Texto>
+            <Ionicons name="time-outline" size={18} color={cores.aviso} />
           </View>
           <Texto variante="legenda" tom="secundaria">Despesas pendentes</Texto>
           <Texto
@@ -369,13 +370,18 @@ export default function TelaDespesas() {
                         estilos.badgeSituacao,
                         estaPaga ? estilos.badgePaga : estilos.badgePendente,
                       ]}>
+                      <Ionicons
+                        name={estaPaga ? 'checkmark-circle-outline' : 'time-outline'}
+                        size={12}
+                        color={estaPaga ? cores.primaria : cores.aviso}
+                      />
                       <Texto
                         variante="legenda"
                         style={[
                           estilos.textoBadgeSituacao,
                           { color: estaPaga ? cores.primaria : cores.aviso },
                         ]}>
-                        {estaPaga ? '✓ Paga' : '○ Pendente (pagar)'}
+                        {estaPaga ? 'Paga' : 'Pendente'}
                       </Texto>
                     </Pressable>
                   </View>
@@ -537,6 +543,9 @@ const estilos = StyleSheet.create({
   },
   badgeSituacao: {
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: raios.pequeno,

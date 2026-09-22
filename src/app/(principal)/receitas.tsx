@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -82,7 +83,7 @@ export default function TelaReceitas() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>$</Texto>
+              <Ionicons name="cash-outline" size={18} color={cores.primaria} />
             </View>
             <Texto variante="legenda" tom="secundaria">Total de entradas</Texto>
             <Texto
@@ -103,7 +104,7 @@ export default function TelaReceitas() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>↗</Texto>
+              <Ionicons name="trending-up-outline" size={18} color={cores.texto} />
             </View>
             <Texto variante="legenda" tom="secundaria">Receitas registradas</Texto>
             <Texto
@@ -125,7 +126,7 @@ export default function TelaReceitas() {
             },
           ]}>
           <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-            <Texto variante="rotulo" style={{ color: cores.texto }}>📅</Texto>
+            <Ionicons name="calendar-outline" size={18} color={cores.texto} />
           </View>
           <Texto variante="legenda" tom="secundaria">Média por lançamento</Texto>
           <Texto

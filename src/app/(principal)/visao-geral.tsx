@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -68,7 +69,7 @@ export default function TelaVisaoGeral() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>💳</Texto>
+              <Ionicons name="wallet-outline" size={18} color={cores.primaria} />
             </View>
             <Texto variante="legenda" tom="secundaria">Saldo disponível</Texto>
             <Texto
@@ -90,7 +91,7 @@ export default function TelaVisaoGeral() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>📅</Texto>
+              <Ionicons name="calendar-outline" size={18} color={cores.texto} />
             </View>
             <Texto variante="legenda" tom="secundaria">Previsão fim do mês</Texto>
             <Texto
@@ -113,7 +114,7 @@ export default function TelaVisaoGeral() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>↗</Texto>
+              <Ionicons name="trending-up-outline" size={18} color={cores.primaria} />
             </View>
             <Texto variante="legenda" tom="secundaria">Total de receitas</Texto>
             <Texto
@@ -135,7 +136,7 @@ export default function TelaVisaoGeral() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Texto variante="rotulo" style={{ color: cores.texto }}>↙</Texto>
+              <Ionicons name="card-outline" size={18} color={cores.texto} />
             </View>
             <Texto variante="legenda" tom="secundaria">Despesas pagas</Texto>
             <Texto
