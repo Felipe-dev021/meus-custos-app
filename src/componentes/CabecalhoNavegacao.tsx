@@ -4,11 +4,18 @@ import { Image, Modal, Pressable, StyleSheet, View } from 'react-native';
 
 import { Texto } from '@/componentes/Texto';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
-import { cores, espacamentos, raios } from '@/tema';
+import { espacamentos, raios } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 
 const logoImagem = require('../../assets/logo.png');
 
-type RotaAtiva = 'visao-geral' | 'receitas' | 'despesas' | 'dividas' | 'assistente' | 'perfil';
+export type RotaAtiva =
+  | 'visao-geral'
+  | 'receitas'
+  | 'despesas'
+  | 'dividas'
+  | 'assistente'
+  | 'perfil';
 
 type PropriedadesCabecalho = {
   rotaAtiva?: RotaAtiva;
@@ -25,11 +32,14 @@ const itensMenu: { id: RotaAtiva; rotulo: string; icone: string; caminho: string
 export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCabecalho) {
   const navegador = useRouter();
   const { dados, executar, salvando } = useFinanceiro();
+  const { tema, cores, alternarTema } = useTema();
   const [menuAberto, definirMenuAberto] = useState(false);
 
-  function navegarPara(caminho: string) {
+  function navegarPara(caminho: string, idItem?: RotaAtiva) {
     definirMenuAberto(false);
-    navegador.push(caminho as any);
+    if (idItem !== rotaAtiva) {
+      navegador.push(caminho as any);
+    }
   }
 
   function sairDemonstracao() {
@@ -46,7 +56,7 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Meus Custos - Início"
-          onPress={() => navegarPara('/(principal)/visao-geral')}
+          onPress={() => navegarPara('/(principal)/visao-geral', 'visao-geral')}
           style={estilos.logoArea}>
           <Image
             source={logoImagem}
@@ -64,10 +74,16 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
           accessibilityRole="button"
           accessibilityLabel="Abrir menu de navegação"
           onPress={() => definirMenuAberto(true)}
-          style={estilos.botaoHamburguer}>
-          <View style={estilos.linhaHamburguer} />
-          <View style={estilos.linhaHamburguer} />
-          <View style={estilos.linhaHamburguer} />
+          style={[
+            estilos.botaoHamburguer,
+            {
+              borderColor: cores.borda,
+              backgroundColor: cores.superficieElevada,
+            },
+          ]}>
+          <View style={[estilos.linhaHamburguer, { backgroundColor: cores.texto }]} />
+          <View style={[estilos.linhaHamburguer, { backgroundColor: cores.texto }]} />
+          <View style={[estilos.linhaHamburguer, { backgroundColor: cores.texto }]} />
         </Pressable>
       </View>
 
@@ -77,7 +93,7 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
         transparent
         animationType="fade"
         onRequestClose={() => definirMenuAberto(false)}>
-        <View style={estilos.fundoModal}>
+        <View style={[estilos.fundoModal, { backgroundColor: cores.fundoModal }]}>
           {/* Toque fora para fechar */}
           <Pressable
             accessibilityLabel="Fechar menu"
@@ -86,8 +102,15 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
           />
 
           {/* Painel lateral do menu */}
-          <View style={estilos.painelDrawer}>
-            {/* Topo do drawer com logo e botão fechar [X] */}
+          <View
+            style={[
+              estilos.painelDrawer,
+              {
+                backgroundColor: cores.painelDrawer,
+                borderRightColor: cores.borda,
+              },
+            ]}>
+            {/* Topo do drawer com logo (sem botão [✕]) */}
             <View style={estilos.topoDrawer}>
               <View style={estilos.logoArea}>
                 <Image
@@ -101,20 +124,12 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
                   {'meus\ncustos'}
                 </Texto>
               </View>
-
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Fechar menu"
-                onPress={() => definirMenuAberto(false)}
-                style={estilos.botaoFechar}>
-                <Texto variante="corpo" tom="secundaria" style={estilos.textoFechar}>
-                  ✕
-                </Texto>
-              </Pressable>
             </View>
 
             {/* Seção Financeiro */}
-            <Texto variante="legenda" style={estilos.rotuloSecao}>
+            <Texto
+              variante="legenda"
+              style={[estilos.rotuloSecao, { color: cores.textoMutado }]}>
               FINANCEIRO
             </Texto>
 
@@ -127,10 +142,10 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
                     accessibilityRole="button"
                     accessibilityLabel={item.rotulo}
                     accessibilityState={{ selected: ativo }}
-                    onPress={() => navegarPara(item.caminho)}
+                    onPress={() => navegarPara(item.caminho, item.id)}
                     style={[
                       estilos.itemLink,
-                      ativo && estilos.itemLinkAtivo,
+                      ativo && { backgroundColor: cores.itemLinkAtivo },
                     ]}>
                     <Texto
                       variante="rotulo"
@@ -149,23 +164,40 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
               })}
             </View>
 
-            <View style={estilos.divisor} />
+            <View style={[estilos.divisor, { backgroundColor: cores.borda }]} />
 
             {/* Alternador de Modo Escuro / Claro */}
-            <View style={estilos.itemTema}>
-              <Texto variante="legenda" tom="secundaria">
-                ☼ Modo escuro ativo
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Modo ${tema === 'escuro' ? 'escuro' : 'claro'} ativo. Toque para alternar o tema.`}
+              onPress={alternarTema}
+              style={[
+                estilos.itemTema,
+                {
+                  backgroundColor: cores.superficieElevada,
+                  borderColor: cores.borda,
+                },
+              ]}>
+              <Texto variante="legenda" tom="secundaria" style={estilos.textoTema}>
+                {tema === 'escuro' ? '☼ Modo escuro ativo' : '☾ Modo claro ativo'}
               </Texto>
-            </View>
+            </Pressable>
 
             {/* Cartão de Perfil na base */}
-            <View style={estilos.rodapeDrawer}>
+            <View style={[estilos.rodapeDrawer, { borderTopColor: cores.borda }]}>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Acessar perfil"
-                onPress={() => navegarPara('/perfil')}
+                onPress={() => navegarPara('/perfil', 'perfil')}
                 style={estilos.perfilConteudo}>
-                <View style={estilos.avatarCirculo}>
+                <View
+                  style={[
+                    estilos.avatarCirculo,
+                    {
+                      borderColor: cores.primaria,
+                      backgroundColor: cores.fundo,
+                    },
+                  ]}>
                   <Texto variante="rotulo" tom="primaria" style={estilos.letraAvatar}>
                     {inicialPerfil}
                   </Texto>
@@ -226,8 +258,6 @@ const estilos = StyleSheet.create({
     height: 44,
     borderRadius: raios.pequeno,
     borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficieElevada,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 5,
@@ -235,13 +265,11 @@ const estilos = StyleSheet.create({
   linhaHamburguer: {
     width: 18,
     height: 2,
-    backgroundColor: cores.texto,
     borderRadius: 1,
   },
   fundoModal: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
   },
   areaFechamento: {
     position: 'absolute',
@@ -254,9 +282,7 @@ const estilos = StyleSheet.create({
     width: '82%',
     maxWidth: 320,
     height: '100%',
-    backgroundColor: '#0c0c0e',
     borderRightWidth: 1,
-    borderRightColor: cores.borda,
     paddingHorizontal: espacamentos.grande,
     paddingTop: espacamentos.amplo,
     paddingBottom: espacamentos.extraGrande,
@@ -265,25 +291,10 @@ const estilos = StyleSheet.create({
   topoDrawer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     paddingBottom: espacamentos.grande,
   },
-  botaoFechar: {
-    width: 38,
-    height: 38,
-    borderRadius: raios.pequeno,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficieElevada,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  textoFechar: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
   rotuloSecao: {
-    color: '#71717a',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -302,29 +313,28 @@ const estilos = StyleSheet.create({
     paddingVertical: espacamentos.medio,
     borderRadius: raios.pequeno,
   },
-  itemLinkAtivo: {
-    backgroundColor: '#1c1c1f',
-  },
   iconeLink: {
     fontSize: 18,
     width: 24,
     textAlign: 'center',
   },
-  textoLink: {
-    color: cores.textoSecundario,
-  },
+  textoLink: {},
   textoLinkAtivo: {
-    color: cores.primaria,
     fontWeight: '700',
   },
   divisor: {
     height: 1,
-    backgroundColor: cores.borda,
     marginVertical: espacamentos.grande,
   },
   itemTema: {
-    paddingHorizontal: espacamentos.pequeno,
+    paddingHorizontal: espacamentos.medio,
+    paddingVertical: espacamentos.medio,
+    borderRadius: raios.pequeno,
+    borderWidth: 1,
     marginBottom: 'auto',
+  },
+  textoTema: {
+    fontWeight: '500',
   },
   rodapeDrawer: {
     flexDirection: 'row',
@@ -332,7 +342,6 @@ const estilos = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: espacamentos.medio,
     borderTopWidth: 1,
-    borderTopColor: cores.borda,
   },
   perfilConteudo: {
     flex: 1,
@@ -345,8 +354,6 @@ const estilos = StyleSheet.create({
     height: 38,
     borderRadius: raios.capsula,
     borderWidth: 1.5,
-    borderColor: cores.primaria,
-    backgroundColor: cores.fundo,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,40 +1,65 @@
-import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useMemo } from 'react';
+import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { cores } from '@/tema';
 import { ProvedorFinanceiro, useFinanceiro } from '@/estado/ContextoFinanceiro';
-
-const temaNavegacao = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: cores.primaria,
-    background: cores.fundo,
-    card: cores.superficie,
-    text: cores.texto,
-    border: cores.borda,
-    notification: cores.perigo,
-  },
-};
+import { ProvedorTema, useTema } from '@/tema/ContextoTema';
 
 export default function LayoutRaiz() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={temaNavegacao}>
-        <StatusBar style="light" />
+      <ProvedorTema>
         <ProvedorFinanceiro>
-          <Navegacao />
+          <AppComTema />
         </ProvedorFinanceiro>
-      </ThemeProvider>
+      </ProvedorTema>
     </SafeAreaProvider>
+  );
+}
+
+function AppComTema() {
+  const { tema, cores } = useTema();
+
+  const temaNavegacao = useMemo(() => {
+    const base = tema === 'escuro' ? DarkTheme : DefaultTheme;
+    return {
+      ...base,
+      colors: {
+        ...base.colors,
+        primary: cores.primaria,
+        background: cores.fundo,
+        card: cores.superficie,
+        text: cores.texto,
+        border: cores.borda,
+        notification: cores.perigo,
+      },
+    };
+  }, [tema, cores]);
+
+  return (
+    <ThemeProvider value={temaNavegacao}>
+      <View style={{ flex: 1, backgroundColor: cores.fundo }}>
+        <StatusBar
+          style={tema === 'escuro' ? 'light' : 'dark'}
+        />
+        <Navegacao />
+      </View>
+    </ThemeProvider>
   );
 }
 
 function Navegacao() {
   const { demonstracaoAtiva } = useFinanceiro();
+  const { cores } = useTema();
+
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: cores.fundo } }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: cores.fundo },
+      }}>
       <Stack.Screen name="index" />
       <Stack.Protected guard={!demonstracaoAtiva}>
         <Stack.Screen name="login" />

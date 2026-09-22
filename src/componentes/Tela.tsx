@@ -1,8 +1,17 @@
 import type { PropsWithChildren } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
-import { cores, espacamentos } from '@/tema';
+import { espacamentos } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 
 type PropriedadesTela = PropsWithChildren<{
   rolagem?: boolean;
@@ -16,8 +25,12 @@ export function Tela({
   edges = ['top', 'right', 'bottom', 'left'],
   contentContainerStyle,
 }: PropriedadesTela) {
+  const { cores } = useTema();
+
   return (
-    <SafeAreaView style={estilos.tela} edges={edges}>
+    <SafeAreaView
+      style={[estilos.tela, { backgroundColor: cores.fundo }]}
+      edges={edges}>
       <KeyboardAvoidingView
         style={estilos.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -29,7 +42,9 @@ export function Tela({
             {children}
           </ScrollView>
         ) : (
-          <View style={[estilos.conteudo, estilos.flex, contentContainerStyle]}>{children}</View>
+          <View style={[estilos.conteudo, estilos.flex, contentContainerStyle]}>
+            {children}
+          </View>
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -37,7 +52,7 @@ export function Tela({
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
+  tela: { flex: 1 },
   flex: { flex: 1 },
   conteudo: {
     flexGrow: 1,

@@ -1,17 +1,11 @@
 import { Text, type TextProps } from 'react-native';
 
-import { cores, tipografia } from '@/tema';
+import { tipografia } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 
 type PropriedadesTexto = TextProps & {
   variante?: keyof typeof tipografia;
   tom?: 'padrao' | 'secundaria' | 'primaria' | 'perigo';
-};
-
-const tons = {
-  padrao: cores.texto,
-  secundaria: cores.textoSecundario,
-  primaria: cores.primaria,
-  perigo: cores.perigo,
 };
 
 export function Texto({
@@ -20,5 +14,19 @@ export function Texto({
   style,
   ...propriedades
 }: PropriedadesTexto) {
-  return <Text {...propriedades} style={[tipografia[variante], { color: tons[tom] }, style]} />;
+  const { cores } = useTema();
+
+  const tons = {
+    padrao: cores.texto,
+    secundaria: cores.textoSecundario,
+    primaria: cores.primaria,
+    perigo: cores.perigo,
+  };
+
+  return (
+    <Text
+      {...propriedades}
+      style={[tipografia[variante], { color: tons[tom] }, style]}
+    />
+  );
 }

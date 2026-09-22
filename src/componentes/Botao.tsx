@@ -1,7 +1,8 @@
 import { ActivityIndicator, Pressable, StyleSheet, type PressableProps } from 'react-native';
 
 import { Texto } from '@/componentes/Texto';
-import { cores, raios, espacamentos } from '@/tema';
+import { espacamentos, raios } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 
 type PropriedadesBotao = Omit<PressableProps, 'children'> & {
   titulo: string;
@@ -18,6 +19,7 @@ export function Botao({
   accessibilityState,
   ...propriedades
 }: PropriedadesBotao) {
+  const { cores } = useTema();
   const indisponivel = disabled || carregando;
   const corTexto = variante === 'primaria' ? cores.sobrePrimaria : cores.texto;
 
@@ -30,8 +32,14 @@ export function Botao({
       disabled={indisponivel}
       style={(estado) => [
         estilos.botao,
-        estilos[variante],
-        estado.pressed && (variante === 'primaria' ? estilos.primariaPressionada : estilos.secundariaPressionada),
+        variante === 'primaria'
+          ? { backgroundColor: cores.primaria, borderColor: cores.primaria }
+          : { backgroundColor: cores.superficie, borderColor: cores.borda },
+        estado.pressed && (
+          variante === 'primaria'
+            ? { backgroundColor: cores.primariaPressionada, borderColor: cores.primariaPressionada }
+            : { backgroundColor: cores.superficieElevada }
+        ),
         indisponivel && estilos.desabilitado,
         typeof style === 'function' ? style(estado) : style,
       ]}>
@@ -55,10 +63,6 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
     gap: espacamentos.pequeno,
   },
-  primaria: { backgroundColor: cores.primaria, borderColor: cores.primaria },
-  secundaria: { backgroundColor: cores.superficie, borderColor: cores.borda },
-  primariaPressionada: { backgroundColor: cores.primariaPressionada },
-  secundariaPressionada: { backgroundColor: cores.superficieElevada },
   desabilitado: { opacity: 0.5 },
   rotulo: { textAlign: 'center', flexShrink: 1 },
 });

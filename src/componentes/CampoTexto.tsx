@@ -2,7 +2,8 @@ import { useId, useState } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
 import { Texto } from '@/componentes/Texto';
-import { cores, raios, espacamentos, tipografia } from '@/tema';
+import { espacamentos, raios, tipografia } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 
 type PropriedadesCampoTexto = TextInputProps & {
   rotulo: string;
@@ -20,16 +21,19 @@ export function CampoTexto({
   editable = true,
   ...propriedades
 }: PropriedadesCampoTexto) {
+  const { cores, tema } = useTema();
   const rotuloId = useId();
   const [focado, definirFocado] = useState(false);
 
   return (
     <View style={estilos.campo}>
-      <Texto nativeID={rotuloId} variante="rotulo">{rotulo}</Texto>
+      <Texto nativeID={rotuloId} variante="rotulo">
+        {rotulo}
+      </Texto>
       <TextInput
         placeholderTextColor={cores.textoSecundario}
         selectionColor={cores.primaria}
-        keyboardAppearance="dark"
+        keyboardAppearance={tema === 'escuro' ? 'dark' : 'light'}
         {...propriedades}
         editable={editable}
         accessibilityLabel={propriedades.accessibilityLabel ?? rotulo}
@@ -45,8 +49,13 @@ export function CampoTexto({
         }}
         style={[
           estilos.entrada,
-          focado && estilos.focado,
-          !!erro && estilos.invalido,
+          {
+            backgroundColor: cores.superficieElevada,
+            borderColor: cores.borda,
+            color: cores.texto,
+          },
+          focado && { borderColor: cores.primaria },
+          !!erro && { borderColor: cores.perigo },
           !editable && estilos.desabilitado,
           style,
         ]}
@@ -72,11 +81,6 @@ const estilos = StyleSheet.create({
     paddingVertical: espacamentos.medio,
     borderRadius: raios.pequeno,
     borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficieElevada,
-    color: cores.texto,
   },
-  focado: { borderColor: cores.primaria },
-  invalido: { borderColor: cores.perigo },
   desabilitado: { opacity: 0.5 },
 });

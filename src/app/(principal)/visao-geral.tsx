@@ -8,12 +8,14 @@ import { Texto } from '@/componentes/Texto';
 import { categoriasDespesa, categoriasReceita } from '@/dominio/categorias';
 import type { Lancamento } from '@/dominio/financeiro';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
-import { cores, espacamentos, raios } from '@/tema';
+import { espacamentos, raios } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 import { formatarData, formatarMoeda } from '@/utilitarios/formatacao';
 
 export default function TelaVisaoGeral() {
   const navegador = useRouter();
   const { resumo, gastosPorCategoria, ultimosLancamentos, dados } = useFinanceiro();
+  const { cores } = useTema();
 
   function obterNomeCategoria(lancamento: Lancamento): string {
     if (lancamento.tipo === 'receita') {
@@ -44,20 +46,29 @@ export default function TelaVisaoGeral() {
           accessibilityRole="button"
           accessibilityLabel="Cadastrar novo lançamento"
           onPress={() => navegador.push('/novo-lancamento')}
-          style={estilos.botaoAcaoVerde}>
-          <Texto variante="rotulo" style={estilos.textoBotaoAcao}>
+          style={[estilos.botaoAcaoVerde, { backgroundColor: cores.primaria }]}>
+          <Texto
+            variante="rotulo"
+            style={[estilos.textoBotaoAcao, { color: cores.sobrePrimaria }]}>
             + Novo lançamento
           </Texto>
         </Pressable>
       </View>
 
-      {/* Grade de Cartões de Métricas (Estilo Site) */}
+      {/* Grade de Cartões de Métricas */}
       <View style={estilos.gradeMetricas}>
         <View style={estilos.linhaMetricas}>
           {/* Card 1: Saldo Disponível */}
-          <Cartao style={estilos.cartaoMetrica}>
-            <View style={estilos.iconeCaixa}>
-              <Texto variante="rotulo" style={estilos.simboloIcone}>💳</Texto>
+          <Cartao
+            style={[
+              estilos.cartaoMetrica,
+              {
+                backgroundColor: cores.cartaoMetrica,
+                borderColor: cores.borda,
+              },
+            ]}>
+            <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+              <Texto variante="rotulo" style={{ color: cores.texto }}>💳</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Saldo disponível</Texto>
             <Texto
@@ -69,12 +80,19 @@ export default function TelaVisaoGeral() {
           </Cartao>
 
           {/* Card 2: Previsão */}
-          <Cartao style={estilos.cartaoMetrica}>
-            <View style={estilos.iconeCaixa}>
-              <Texto variante="rotulo" style={estilos.simboloIcone}>📅</Texto>
+          <Cartao
+            style={[
+              estilos.cartaoMetrica,
+              {
+                backgroundColor: cores.cartaoMetrica,
+                borderColor: cores.borda,
+              },
+            ]}>
+            <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+              <Texto variante="rotulo" style={{ color: cores.texto }}>📅</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Previsão fim do mês</Texto>
-            <Texto variante="subtitulo" style={estilos.valorMetrica}>
+            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(resumo.saldoPrevisto)}
             </Texto>
           </Cartao>
@@ -82,9 +100,16 @@ export default function TelaVisaoGeral() {
 
         <View style={estilos.linhaMetricas}>
           {/* Card 3: Receitas */}
-          <Cartao style={estilos.cartaoMetrica}>
-            <View style={estilos.iconeCaixa}>
-              <Texto variante="rotulo" style={estilos.simboloIcone}>↗</Texto>
+          <Cartao
+            style={[
+              estilos.cartaoMetrica,
+              {
+                backgroundColor: cores.cartaoMetrica,
+                borderColor: cores.borda,
+              },
+            ]}>
+            <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+              <Texto variante="rotulo" style={{ color: cores.texto }}>↗</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Total de receitas</Texto>
             <Texto variante="subtitulo" tom="primaria" style={estilos.valorMetrica}>
@@ -93,12 +118,19 @@ export default function TelaVisaoGeral() {
           </Cartao>
 
           {/* Card 4: Despesas pagas */}
-          <Cartao style={estilos.cartaoMetrica}>
-            <View style={estilos.iconeCaixa}>
-              <Texto variante="rotulo" style={estilos.simboloIcone}>↙</Texto>
+          <Cartao
+            style={[
+              estilos.cartaoMetrica,
+              {
+                backgroundColor: cores.cartaoMetrica,
+                borderColor: cores.borda,
+              },
+            ]}>
+            <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+              <Texto variante="rotulo" style={{ color: cores.texto }}>↙</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Despesas pagas</Texto>
-            <Texto variante="subtitulo" style={estilos.valorMetrica}>
+            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(resumo.despesasPagas)}
             </Texto>
           </Cartao>
@@ -106,7 +138,14 @@ export default function TelaVisaoGeral() {
       </View>
 
       {/* Gastos por categoria */}
-      <Cartao style={estilos.painel}>
+      <Cartao
+        style={[
+          estilos.painel,
+          {
+            backgroundColor: cores.cartaoMetrica,
+            borderColor: cores.borda,
+          },
+        ]}>
         <Texto variante="subtitulo" accessibilityRole="header">
           Gastos por categoria
         </Texto>
@@ -143,8 +182,16 @@ export default function TelaVisaoGeral() {
                       </Texto>
                     </View>
                   </View>
-                  <View style={estilos.trilhoBarra}>
-                    <View style={[estilos.progressoBarra, { width: `${larguraBarra}%` }]} />
+                  <View style={[estilos.trilhoBarra, { backgroundColor: cores.superficieElevada }]}>
+                    <View
+                      style={[
+                        estilos.progressoBarra,
+                        {
+                          width: `${larguraBarra}%`,
+                          backgroundColor: cores.primaria,
+                        },
+                      ]}
+                    />
                   </View>
                 </View>
               );
@@ -154,7 +201,14 @@ export default function TelaVisaoGeral() {
       </Cartao>
 
       {/* Últimos lançamentos */}
-      <Cartao style={estilos.painel}>
+      <Cartao
+        style={[
+          estilos.painel,
+          {
+            backgroundColor: cores.cartaoMetrica,
+            borderColor: cores.borda,
+          },
+        ]}>
         <View style={estilos.cabecalhoSecaoLista}>
           <View>
             <Texto variante="subtitulo" accessibilityRole="header">
@@ -189,7 +243,7 @@ export default function TelaVisaoGeral() {
                   key={item.id}
                   style={[
                     estilos.itemLancamento,
-                    index > 0 && estilos.separadorLancamento,
+                    index > 0 && [estilos.separadorLancamento, { borderTopColor: cores.borda }],
                   ]}>
                   <View style={estilos.infoLancamento}>
                     <Texto variante="corpo" style={estilos.descricaoLancamento}>
@@ -201,7 +255,9 @@ export default function TelaVisaoGeral() {
                       </Texto>
                       {!estaPaga && (
                         <View style={estilos.tagPendente}>
-                          <Texto variante="legenda" style={estilos.textoTagPendente}>
+                          <Texto
+                            variante="legenda"
+                            style={[estilos.textoTagPendente, { color: cores.aviso }]}>
                             Pendente
                           </Texto>
                         </View>
@@ -235,13 +291,11 @@ const estilos = StyleSheet.create({
   },
   botaoAcaoVerde: {
     alignSelf: 'flex-start',
-    backgroundColor: cores.primaria,
     paddingHorizontal: espacamentos.grande,
     paddingVertical: espacamentos.medio - 2,
     borderRadius: raios.pequeno,
   },
   textoBotaoAcao: {
-    color: '#001a09',
     fontWeight: '700',
   },
   gradeMetricas: {
@@ -255,31 +309,21 @@ const estilos = StyleSheet.create({
     flex: 1,
     padding: espacamentos.grande,
     gap: espacamentos.pequeno,
-    backgroundColor: '#121214',
-    borderColor: cores.borda,
   },
   iconeCaixa: {
     width: 32,
     height: 32,
     borderRadius: raios.pequeno - 2,
-    backgroundColor: '#1c1c1f',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
-  },
-  simboloIcone: {
-    fontSize: 16,
-    color: cores.texto,
   },
   valorMetrica: {
     fontSize: 18,
     lineHeight: 24,
     fontWeight: '700',
-    color: cores.texto,
   },
   painel: {
-    backgroundColor: '#121214',
-    borderColor: cores.borda,
     gap: espacamentos.medio,
   },
   cabecalhoSecaoLista: {
@@ -313,13 +357,11 @@ const estilos = StyleSheet.create({
   trilhoBarra: {
     height: 6,
     borderRadius: raios.capsula,
-    backgroundColor: cores.superficieElevada,
     overflow: 'hidden',
   },
   progressoBarra: {
     height: '100%',
     borderRadius: raios.capsula,
-    backgroundColor: cores.primaria,
   },
   listaLancamentos: {
     marginTop: espacamentos.pequeno,
@@ -332,7 +374,6 @@ const estilos = StyleSheet.create({
   },
   separadorLancamento: {
     borderTopWidth: 1,
-    borderTopColor: cores.borda,
   },
   infoLancamento: {
     flex: 1,
@@ -354,7 +395,6 @@ const estilos = StyleSheet.create({
     backgroundColor: 'rgba(249, 156, 0, 0.15)',
   },
   textoTagPendente: {
-    color: cores.aviso,
     fontSize: 11,
     lineHeight: 14,
     fontWeight: '600',

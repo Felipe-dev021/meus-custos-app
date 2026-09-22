@@ -9,12 +9,14 @@ import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
 import { categoriasReceita } from '@/dominio/categorias';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
-import { cores, espacamentos, raios } from '@/tema';
+import { espacamentos, raios } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 import { formatarData, formatarMoeda } from '@/utilitarios/formatacao';
 
 export default function TelaReceitas() {
   const navegador = useRouter();
   const { receitas, resumo } = useFinanceiro();
+  const { cores } = useTema();
   const [busca, definirBusca] = useState('');
 
   const receitasFiltradas = useMemo(() => {
@@ -58,53 +60,83 @@ export default function TelaReceitas() {
           accessibilityRole="button"
           accessibilityLabel="Cadastrar nova receita"
           onPress={() => navegador.push({ pathname: '/novo-lancamento', params: { tipo: 'receita' } })}
-          style={estilos.botaoAcaoVerde}>
-          <Texto variante="rotulo" style={estilos.textoBotaoAcao}>
+          style={[estilos.botaoAcaoVerde, { backgroundColor: cores.primaria }]}>
+          <Texto
+            variante="rotulo"
+            style={[estilos.textoBotaoAcao, { color: cores.sobrePrimaria }]}>
             + Nova receita
           </Texto>
         </Pressable>
       </View>
 
-      {/* Grade de Cartões de Métricas (Igual ao site/fotos) */}
+      {/* Grade de Cartões de Métricas */}
       <View style={estilos.gradeMetricas}>
         <View style={estilos.linhaMetricas}>
           {/* Card 1: Total de entradas */}
-          <Cartao style={estilos.cartaoMetrica}>
-            <View style={estilos.iconeCaixa}>
-              <Texto variante="rotulo" style={estilos.simboloIcone}>$</Texto>
+          <Cartao
+            style={[
+              estilos.cartaoMetrica,
+              {
+                backgroundColor: cores.cartaoMetrica,
+                borderColor: cores.borda,
+              },
+            ]}>
+            <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+              <Texto variante="rotulo" style={{ color: cores.texto }}>$</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Total de entradas</Texto>
-            <Texto variante="subtitulo" style={estilos.valorMetrica}>
+            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(totalExibido)}
             </Texto>
           </Cartao>
 
           {/* Card 2: Receitas registradas */}
-          <Cartao style={estilos.cartaoMetrica}>
-            <View style={estilos.iconeCaixa}>
-              <Texto variante="rotulo" style={estilos.simboloIcone}>↗</Texto>
+          <Cartao
+            style={[
+              estilos.cartaoMetrica,
+              {
+                backgroundColor: cores.cartaoMetrica,
+                borderColor: cores.borda,
+              },
+            ]}>
+            <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+              <Texto variante="rotulo" style={{ color: cores.texto }}>↗</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Receitas registradas</Texto>
-            <Texto variante="subtitulo" style={estilos.valorMetrica}>
+            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
               {receitasFiltradas.length}
             </Texto>
           </Cartao>
         </View>
 
         {/* Card 3: Média por lançamento */}
-        <Cartao style={estilos.cartaoMetricaUnico}>
-          <View style={estilos.iconeCaixa}>
-            <Texto variante="rotulo" style={estilos.simboloIcone}>📅</Texto>
+        <Cartao
+          style={[
+            estilos.cartaoMetricaUnico,
+            {
+              backgroundColor: cores.cartaoMetrica,
+              borderColor: cores.borda,
+            },
+          ]}>
+          <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+            <Texto variante="rotulo" style={{ color: cores.texto }}>📅</Texto>
           </View>
           <Texto variante="legenda" tom="secundaria">Média por lançamento</Texto>
-          <Texto variante="subtitulo" style={estilos.valorMetrica}>
+          <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
             {formatarMoeda(mediaPorLancamento)}
           </Texto>
         </Cartao>
       </View>
 
       {/* Painel com Tabela/Lista de Entradas */}
-      <Cartao style={estilos.painelLista}>
+      <Cartao
+        style={[
+          estilos.painelLista,
+          {
+            backgroundColor: cores.cartaoMetrica,
+            borderColor: cores.borda,
+          },
+        ]}>
         <View style={estilos.topoPainel}>
           <View>
             <Texto variante="subtitulo" accessibilityRole="header">
@@ -127,14 +159,20 @@ export default function TelaReceitas() {
         />
 
         {/* Cabeçalho da Lista / Tabela */}
-        <View style={estilos.cabecalhoTabela}>
-          <Texto variante="legenda" style={estilos.colunaCabecalhoDescricao}>
+        <View style={[estilos.cabecalhoTabela, { borderBottomColor: cores.borda }]}>
+          <Texto
+            variante="legenda"
+            style={[estilos.colunaCabecalhoDescricao, { color: cores.textoMutado }]}>
             DESCRIÇÃO
           </Texto>
-          <Texto variante="legenda" style={estilos.colunaCabecalhoCategoria}>
+          <Texto
+            variante="legenda"
+            style={[estilos.colunaCabecalhoCategoria, { color: cores.textoMutado }]}>
             CATEGORIA
           </Texto>
-          <Texto variante="legenda" style={estilos.colunaCabecalhoData}>
+          <Texto
+            variante="legenda"
+            style={[estilos.colunaCabecalhoData, { color: cores.textoMutado }]}>
             DATA / VALOR
           </Texto>
         </View>
@@ -165,7 +203,7 @@ export default function TelaReceitas() {
                 key={item.id}
                 style={[
                   estilos.linhaTabela,
-                  index > 0 && estilos.separadorLinha,
+                  index > 0 && [estilos.separadorLinha, { borderTopColor: cores.borda }],
                 ]}>
                 <View style={estilos.colunaDescricao}>
                   <Texto variante="corpo" style={estilos.textoDescricao}>
@@ -174,8 +212,18 @@ export default function TelaReceitas() {
                 </View>
 
                 <View style={estilos.colunaCategoria}>
-                  <View style={estilos.tagCategoriaPill}>
-                    <Texto variante="legenda" tom="secundaria" style={estilos.textoCategoriaPill}>
+                  <View
+                    style={[
+                      estilos.tagCategoriaPill,
+                      {
+                        backgroundColor: cores.tagPill,
+                        borderColor: cores.borda,
+                      },
+                    ]}>
+                    <Texto
+                      variante="legenda"
+                      tom="secundaria"
+                      style={estilos.textoCategoriaPill}>
                       {categoriasReceita[item.categoria] ?? item.categoria}
                     </Texto>
                   </View>
@@ -207,13 +255,11 @@ const estilos = StyleSheet.create({
   },
   botaoAcaoVerde: {
     alignSelf: 'flex-start',
-    backgroundColor: cores.primaria,
     paddingHorizontal: espacamentos.grande,
     paddingVertical: espacamentos.medio - 2,
     borderRadius: raios.pequeno,
   },
   textoBotaoAcao: {
-    color: '#001a09',
     fontWeight: '700',
   },
   gradeMetricas: {
@@ -227,36 +273,25 @@ const estilos = StyleSheet.create({
     flex: 1,
     padding: espacamentos.grande,
     gap: espacamentos.pequeno,
-    backgroundColor: '#121214',
-    borderColor: cores.borda,
   },
   cartaoMetricaUnico: {
     padding: espacamentos.grande,
     gap: espacamentos.pequeno,
-    backgroundColor: '#121214',
-    borderColor: cores.borda,
   },
   iconeCaixa: {
     width: 32,
     height: 32,
     borderRadius: raios.pequeno - 2,
-    backgroundColor: '#1c1c1f',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
-  },
-  simboloIcone: {
-    fontSize: 16,
-    color: cores.texto,
   },
   valorMetrica: {
     fontSize: 22,
     lineHeight: 28,
     fontWeight: '700',
-    color: cores.texto,
   },
   painelLista: {
-    backgroundColor: '#121214',
     gap: espacamentos.grande,
   },
   topoPainel: {
@@ -267,26 +302,22 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: espacamentos.pequeno,
     borderBottomWidth: 1,
-    borderBottomColor: cores.borda,
   },
   colunaCabecalhoDescricao: {
     flex: 1.4,
     fontSize: 11,
-    color: '#71717a',
     fontWeight: '700',
     letterSpacing: 0.8,
   },
   colunaCabecalhoCategoria: {
     flex: 1.2,
     fontSize: 11,
-    color: '#71717a',
     fontWeight: '700',
     letterSpacing: 0.8,
   },
   colunaCabecalhoData: {
     flex: 1.2,
     fontSize: 11,
-    color: '#71717a',
     fontWeight: '700',
     letterSpacing: 0.8,
     textAlign: 'right',
@@ -301,7 +332,6 @@ const estilos = StyleSheet.create({
   },
   separadorLinha: {
     borderTopWidth: 1,
-    borderTopColor: cores.borda,
   },
   colunaDescricao: {
     flex: 1.4,
@@ -320,13 +350,10 @@ const estilos = StyleSheet.create({
     paddingHorizontal: espacamentos.medio,
     paddingVertical: 4,
     borderRadius: raios.capsula,
-    backgroundColor: '#1c1c1f',
     borderWidth: 1,
-    borderColor: cores.borda,
   },
   textoCategoriaPill: {
     fontSize: 12,
-    color: cores.textoSecundario,
   },
   colunaValorData: {
     flex: 1.2,
@@ -334,7 +361,6 @@ const estilos = StyleSheet.create({
     gap: 2,
   },
   textoValorVerde: {
-    color: cores.primaria,
     fontWeight: '700',
     fontSize: 14,
   },
