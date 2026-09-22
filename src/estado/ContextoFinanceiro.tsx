@@ -6,7 +6,14 @@ import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
 import { CHAVE_DADOS } from '@/dados/persistencia';
 
-import { calcularGastosPorCategoria, calcularResumoFinanceiro, listarDespesas, listarReceitas, listarUltimosLancamentos } from '@/dominio/consultas-financeiras';
+import {
+  calcularGastosPorCategoria,
+  calcularResumoDividas,
+  calcularResumoFinanceiro,
+  listarDespesas,
+  listarReceitas,
+  listarUltimosLancamentos,
+} from '@/dominio/consultas-financeiras';
 import { criarEstadoFinanceiro } from '@/estado/estado-financeiro';
 
 const ContextoFinanceiro = createContext<ReturnType<typeof criarEstadoFinanceiro> | null>(null);
@@ -39,11 +46,12 @@ export function useFinanceiro() {
   const estado = useSyncExternalStore(central.assinar, central.obterEstado, central.obterEstado);
   const consultas = useMemo(() => ({
     resumo: calcularResumoFinanceiro(estado.dados.lancamentos),
+    resumoDividas: calcularResumoDividas(estado.dados.dividas),
     receitas: listarReceitas(estado.dados.lancamentos),
     despesas: listarDespesas(estado.dados.lancamentos),
     gastosPorCategoria: calcularGastosPorCategoria(estado.dados.lancamentos),
     ultimosLancamentos: listarUltimosLancamentos(estado.dados.lancamentos),
-  }), [estado.dados.lancamentos]);
+  }), [estado.dados.lancamentos, estado.dados.dividas]);
 
   return { ...estado, ...consultas, executar: central.executar };
 }

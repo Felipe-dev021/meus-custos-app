@@ -1,4 +1,4 @@
-import type { CategoriaDespesa, Centavos, Despesa, Lancamento, Receita } from './financeiro';
+import type { CategoriaDespesa, Centavos, Despesa, Divida, Lancamento, Receita } from './financeiro';
 
 export type ResumoFinanceiro = {
   receitasRecebidas: Centavos;
@@ -101,4 +101,44 @@ export function listarUltimosLancamentos(
     .reverse()
     .sort((primeiro, segundo) => segundo.data.localeCompare(primeiro.data))
     .slice(0, limite);
+}
+
+export type ResumoDividas = {
+  saldoDevedorTotal: Centavos;
+  totalDividas: Centavos;
+  totalPago: Centavos;
+  quantidadeDividas: number;
+  quantidadeQuitadas: number;
+};
+
+/** Consolida os valores de todas as dívidas e parcelas registradas. */
+export function calcularResumoDividas(dividas: readonly Divida[]): ResumoDividas {
+  let saldoDevedorTotal = 0;
+  let totalDividas = 0;
+  let totalPago = 0;
+  let quantidadeQuitadas = 0;
+
+  for (const divida of dividas) {
+    let pendenteDivida = 0;
+    for (const parcela of divida.parcelas) {
+      totalDividas += parcela.valorCentavos;
+      if (parcela.situacao === 'paga') {
+        totalPago += parcela.valorCentavos;
+      } else {
+        pendenteDivida += parcela.valorCentavos;
+        saldoDevedorTotal += parcela.valorCentavos;
+      }
+    }
+    if (pendenteDivida === 0 && divida.parcelas.length > 0) {
+      quantidadeQuitadas += 1;
+    }
+  }
+
+  return {
+    saldoDevedorTotal,
+    totalDividas,
+    totalPago,
+    quantidadeDividas: dividas.length,
+    quantidadeQuitadas,
+  };
 }
