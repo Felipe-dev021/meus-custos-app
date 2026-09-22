@@ -98,6 +98,7 @@ export default function TelaDividas() {
             <Texto
               variante="subtitulo"
               tom={resumoDividas.saldoDevedorTotal > 0 ? 'perigo' : 'primaria'}
+              numberOfLines={1}
               style={estilos.valorMetrica}>
               {formatarMoeda(resumoDividas.saldoDevedorTotal)}
             </Texto>
@@ -116,7 +117,11 @@ export default function TelaDividas() {
               <Texto variante="rotulo" style={{ color: cores.texto }}>✓</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Total já pago</Texto>
-            <Texto variante="subtitulo" tom="primaria" style={estilos.valorMetrica}>
+            <Texto
+              variante="subtitulo"
+              tom="primaria"
+              numberOfLines={1}
+              style={estilos.valorMetrica}>
               {formatarMoeda(resumoDividas.totalPago)}
             </Texto>
           </Cartao>
@@ -135,7 +140,10 @@ export default function TelaDividas() {
             <Texto variante="rotulo" style={{ color: cores.texto }}>📊</Texto>
           </View>
           <Texto variante="legenda" tom="secundaria">Dívidas quitadas</Texto>
-          <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
+          <Texto
+            variante="subtitulo"
+            numberOfLines={1}
+            style={[estilos.valorMetrica, { color: cores.texto }]}>
             {`${resumoDividas.quantidadeQuitadas} de ${resumoDividas.quantidadeDividas} concluídas`}
           </Texto>
         </Cartao>

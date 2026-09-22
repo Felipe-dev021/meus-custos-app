@@ -9,10 +9,13 @@ import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
 import { temErrosLogin, validarCredenciaisLogin, type ErrosLogin } from '@/dominio/validacao-login';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
-import { cores, espacamentos, raios } from '@/tema';
+import { espacamentos, raios } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 
 export default function TelaLogin() {
   const { executar, salvando } = useFinanceiro();
+  const { cores } = useTema();
+
   const [email, definirEmail] = useState('');
   const [senha, definirSenha] = useState('');
   const [erros, definirErros] = useState<ErrosLogin>({});
@@ -94,15 +97,28 @@ export default function TelaLogin() {
       </Cartao>
 
       <View style={estilos.divisor}>
-        <View style={estilos.linhaDivisor} />
+        <View style={[estilos.linhaDivisor, { backgroundColor: cores.borda }]} />
         <Texto variante="legenda" tom="secundaria" style={estilos.textoDivisor}>
           OU
         </Texto>
-        <View style={estilos.linhaDivisor} />
+        <View style={[estilos.linhaDivisor, { backgroundColor: cores.borda }]} />
       </View>
 
-      <Cartao style={estilos.cartaoDemonstracao}>
-        <View style={estilos.selo}>
+      <Cartao
+        style={[
+          estilos.cartaoDemonstracao,
+          {
+            borderColor: cores.borda,
+            backgroundColor: cores.superficie,
+          },
+        ]}>
+        <View
+          style={[
+            estilos.selo,
+            {
+              backgroundColor: cores.primariaSuave,
+            },
+          ]}>
           <Texto variante="legenda" tom="primaria">
             ACESSO RÁPIDO
           </Texto>
@@ -130,9 +146,9 @@ export default function TelaLogin() {
 
 const estilos = StyleSheet.create({
   conteudo: {
-    paddingTop: espacamentos.amplo,
+    paddingTop: espacamentos.grande,
     paddingBottom: espacamentos.amplo,
-    gap: espacamentos.extraGrande,
+    gap: espacamentos.grande,
   },
   cabecalho: {
     gap: espacamentos.pequeno,
@@ -149,7 +165,6 @@ const estilos = StyleSheet.create({
   linhaDivisor: {
     flex: 1,
     height: 1,
-    backgroundColor: cores.borda,
   },
   textoDivisor: {
     letterSpacing: 1.5,
@@ -157,14 +172,12 @@ const estilos = StyleSheet.create({
   },
   cartaoDemonstracao: {
     borderStyle: 'dashed',
-    borderColor: cores.borda,
   },
   selo: {
     alignSelf: 'flex-start',
     paddingHorizontal: espacamentos.medio,
     paddingVertical: espacamentos.minimo,
     borderRadius: raios.capsula,
-    backgroundColor: cores.primariaSuave,
   },
   rodape: {
     marginTop: 'auto',

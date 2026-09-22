@@ -85,7 +85,10 @@ export default function TelaReceitas() {
               <Texto variante="rotulo" style={{ color: cores.texto }}>$</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Total de entradas</Texto>
-            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
+            <Texto
+              variante="subtitulo"
+              numberOfLines={1}
+              style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(totalExibido)}
             </Texto>
           </Cartao>
@@ -103,7 +106,10 @@ export default function TelaReceitas() {
               <Texto variante="rotulo" style={{ color: cores.texto }}>↗</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Receitas registradas</Texto>
-            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
+            <Texto
+              variante="subtitulo"
+              numberOfLines={1}
+              style={[estilos.valorMetrica, { color: cores.texto }]}>
               {receitasFiltradas.length}
             </Texto>
           </Cartao>
@@ -122,7 +128,10 @@ export default function TelaReceitas() {
             <Texto variante="rotulo" style={{ color: cores.texto }}>📅</Texto>
           </View>
           <Texto variante="legenda" tom="secundaria">Média por lançamento</Texto>
-          <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
+          <Texto
+            variante="subtitulo"
+            numberOfLines={1}
+            style={[estilos.valorMetrica, { color: cores.texto }]}>
             {formatarMoeda(mediaPorLancamento)}
           </Texto>
         </Cartao>

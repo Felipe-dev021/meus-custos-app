@@ -11,7 +11,8 @@ import { categoriasDespesa, categoriasReceita } from '@/dominio/categorias';
 import type { CategoriaDespesa, CategoriaReceita } from '@/dominio/financeiro';
 import type { NovoLancamento } from '@/dominio/operacoes-financeiras';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
-import { cores, espacamentos, raios } from '@/tema';
+import { espacamentos, raios } from '@/tema';
+import { useTema } from '@/tema/ContextoTema';
 import {
   converterDataBrasileiraParaCivil,
   converterRealParaCentavos,
@@ -34,6 +35,7 @@ export default function TelaNovoLancamento() {
   const navegador = useRouter();
   const parametros = useLocalSearchParams<ParametrosRota>();
   const { executar, salvando } = useFinanceiro();
+  const { cores } = useTema();
 
   const [tipo, definirTipo] = useState<'receita' | 'despesa'>(
     parametros.tipo === 'receita' ? 'receita' : 'despesa',
@@ -144,7 +146,14 @@ export default function TelaNovoLancamento() {
       </View>
 
       {/* Seletor de Tipo (Receita / Despesa) */}
-      <View style={estilos.seletorTipo}>
+      <View
+        style={[
+          estilos.seletorTipo,
+          {
+            backgroundColor: cores.superficie,
+            borderColor: cores.borda,
+          },
+        ]}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Selecionar tipo Receita"
@@ -152,7 +161,13 @@ export default function TelaNovoLancamento() {
           onPress={() => alternarTipo('receita')}
           style={[
             estilos.opcaoTipo,
-            tipo === 'receita' && estilos.opcaoTipoAtiva,
+            tipo === 'receita' && [
+              estilos.opcaoTipoAtiva,
+              {
+                backgroundColor: cores.superficieElevada,
+                borderColor: cores.primaria,
+              },
+            ],
           ]}>
           <Texto
             variante="rotulo"
@@ -168,7 +183,13 @@ export default function TelaNovoLancamento() {
           onPress={() => alternarTipo('despesa')}
           style={[
             estilos.opcaoTipo,
-            tipo === 'despesa' && estilos.opcaoTipoAtiva,
+            tipo === 'despesa' && [
+              estilos.opcaoTipoAtiva,
+              {
+                backgroundColor: cores.superficieElevada,
+                borderColor: cores.primaria,
+              },
+            ],
           ]}>
           <Texto
             variante="rotulo"
@@ -218,12 +239,17 @@ export default function TelaNovoLancamento() {
                   onPress={() => definirCategoria(chave)}
                   style={[
                     estilos.chipCategoria,
-                    selecionada && estilos.chipCategoriaAtivo,
+                    {
+                      borderColor: selecionada ? cores.primaria : cores.borda,
+                      backgroundColor: selecionada ? cores.primariaSuave : cores.superficieElevada,
+                    },
                   ]}>
                   <Texto
                     variante="legenda"
-                    tom={selecionada ? 'primaria' : 'secundaria'}
-                    style={selecionada && estilos.textoChipAtivo}>
+                    style={[
+                      { color: selecionada ? cores.primaria : cores.textoSecundario },
+                      selecionada && estilos.textoChipAtivo,
+                    ]}>
                     {rotulo}
                   </Texto>
                 </Pressable>
@@ -256,7 +282,10 @@ export default function TelaNovoLancamento() {
                 onPress={() => definirSituacao('paga')}
                 style={[
                   estilos.opcaoSituacao,
-                  situacao === 'paga' && estilos.opcaoSituacaoAtiva,
+                  {
+                    borderColor: situacao === 'paga' ? cores.primaria : cores.borda,
+                    backgroundColor: situacao === 'paga' ? cores.primariaSuave : cores.superficieElevada,
+                  },
                 ]}>
                 <Texto
                   variante="rotulo"
@@ -272,7 +301,10 @@ export default function TelaNovoLancamento() {
                 onPress={() => definirSituacao('pendente')}
                 style={[
                   estilos.opcaoSituacao,
-                  situacao === 'pendente' && estilos.opcaoSituacaoAtiva,
+                  {
+                    borderColor: situacao === 'pendente' ? cores.primaria : cores.borda,
+                    backgroundColor: situacao === 'pendente' ? cores.primariaSuave : cores.superficieElevada,
+                  },
                 ]}>
                 <Texto
                   variante="rotulo"
@@ -316,11 +348,9 @@ const estilos = StyleSheet.create({
   seletorTipo: {
     flexDirection: 'row',
     gap: espacamentos.medio,
-    backgroundColor: cores.superficie,
     padding: espacamentos.minimo,
     borderRadius: raios.pequeno,
     borderWidth: 1,
-    borderColor: cores.borda,
   },
   opcaoTipo: {
     flex: 1,
@@ -330,9 +360,7 @@ const estilos = StyleSheet.create({
     borderRadius: raios.pequeno - 2,
   },
   opcaoTipoAtiva: {
-    backgroundColor: cores.superficieElevada,
     borderWidth: 1,
-    borderColor: cores.primaria,
   },
   secaoCampo: {
     gap: espacamentos.pequeno,
@@ -347,12 +375,6 @@ const estilos = StyleSheet.create({
     paddingVertical: espacamentos.pequeno,
     borderRadius: raios.capsula,
     borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficieElevada,
-  },
-  chipCategoriaAtivo: {
-    borderColor: cores.primaria,
-    backgroundColor: cores.primariaSuave,
   },
   textoChipAtivo: {
     fontWeight: '600',
@@ -368,12 +390,6 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: raios.pequeno,
     borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficieElevada,
-  },
-  opcaoSituacaoAtiva: {
-    borderColor: cores.primaria,
-    backgroundColor: cores.primariaSuave,
   },
   botaoSalvar: {
     marginTop: espacamentos.medio,

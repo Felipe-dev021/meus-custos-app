@@ -95,7 +95,13 @@ export default function TelaPerfil() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Voltar à tela anterior"
-          onPress={() => navegador.back()}
+          onPress={() => {
+            if (navegador.canGoBack()) {
+              navegador.back();
+            } else {
+              navegador.replace('/(principal)/visao-geral');
+            }
+          }}
           style={estilos.botaoVoltar}>
           <Texto variante="rotulo" tom="primaria">
             ← Voltar

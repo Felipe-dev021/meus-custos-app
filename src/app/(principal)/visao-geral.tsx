@@ -74,6 +74,7 @@ export default function TelaVisaoGeral() {
             <Texto
               variante="subtitulo"
               tom={resumo.saldoDisponivel >= 0 ? 'primaria' : 'perigo'}
+              numberOfLines={1}
               style={estilos.valorMetrica}>
               {formatarMoeda(resumo.saldoDisponivel)}
             </Texto>
@@ -92,7 +93,10 @@ export default function TelaVisaoGeral() {
               <Texto variante="rotulo" style={{ color: cores.texto }}>📅</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Previsão fim do mês</Texto>
-            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
+            <Texto
+              variante="subtitulo"
+              numberOfLines={1}
+              style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(resumo.saldoPrevisto)}
             </Texto>
           </Cartao>
@@ -112,7 +116,11 @@ export default function TelaVisaoGeral() {
               <Texto variante="rotulo" style={{ color: cores.texto }}>↗</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Total de receitas</Texto>
-            <Texto variante="subtitulo" tom="primaria" style={estilos.valorMetrica}>
+            <Texto
+              variante="subtitulo"
+              tom="primaria"
+              numberOfLines={1}
+              style={estilos.valorMetrica}>
               {formatarMoeda(resumo.receitasRecebidas)}
             </Texto>
           </Cartao>
@@ -130,7 +138,10 @@ export default function TelaVisaoGeral() {
               <Texto variante="rotulo" style={{ color: cores.texto }}>↙</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Despesas pagas</Texto>
-            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
+            <Texto
+              variante="subtitulo"
+              numberOfLines={1}
+              style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(resumo.despesasPagas)}
             </Texto>
           </Cartao>

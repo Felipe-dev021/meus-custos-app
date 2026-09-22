@@ -133,7 +133,10 @@ export default function TelaDespesas() {
               <Texto variante="rotulo" style={{ color: cores.texto }}>💳</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Total de despesas</Texto>
-            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
+            <Texto
+              variante="subtitulo"
+              numberOfLines={1}
+              style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(resumo.despesasPagas + resumo.despesasPendentes)}
             </Texto>
           </Cartao>
@@ -151,7 +154,10 @@ export default function TelaDespesas() {
               <Texto variante="rotulo" style={{ color: cores.texto }}>✓</Texto>
             </View>
             <Texto variante="legenda" tom="secundaria">Despesas pagas</Texto>
-            <Texto variante="subtitulo" style={[estilos.valorMetrica, { color: cores.texto }]}>
+            <Texto
+              variante="subtitulo"
+              numberOfLines={1}
+              style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(resumo.despesasPagas)}
             </Texto>
           </Cartao>
@@ -173,6 +179,7 @@ export default function TelaDespesas() {
           <Texto
             variante="subtitulo"
             tom={resumo.despesasPendentes > 0 ? 'perigo' : 'padrao'}
+            numberOfLines={1}
             style={estilos.valorMetrica}>
             {formatarMoeda(resumo.despesasPendentes)}
           </Texto>
