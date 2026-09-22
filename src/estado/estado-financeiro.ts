@@ -1,7 +1,7 @@
 import { criarDadosDemonstracao } from '../dados/demonstracao.ts';
 import { restaurarDados, serializarDados, type ArmazenamentoFinanceiro } from '../dados/persistencia.ts';
 import type { DadosFinanceiros, DataCivil, Perfil } from '../dominio/financeiro';
-import { cadastrarLancamento, pagarDespesa, pagarParcela, type NovoLancamento } from '../dominio/operacoes-financeiras.ts';
+import { cadastrarLancamento, pagarDespesa, pagarParcela, reverterPagamentoDespesa, type NovoLancamento } from '../dominio/operacoes-financeiras.ts';
 
 export type EstadoFinanceiro = {
   dados: DadosFinanceiros;
@@ -17,6 +17,7 @@ export type AcaoFinanceira =
   | { tipo: 'atualizar-perfil'; perfil: Perfil }
   | { tipo: 'cadastrar-lancamento'; entrada: NovoLancamento; id: string; hoje: DataCivil }
   | { tipo: 'pagar-despesa'; id: string; dataPagamento: DataCivil; hoje: DataCivil }
+  | { tipo: 'reverter-pagamento-despesa'; id: string }
   | { tipo: 'pagar-parcela'; dividaId: string; parcelaId: string; dataPagamento: DataCivil; hoje: DataCivil };
 
 function validarPerfil(perfil: Perfil): Perfil {
@@ -50,6 +51,9 @@ function aplicarAcao(estado: EstadoFinanceiro, acao: AcaoFinanceira): EstadoFina
       break;
     case 'pagar-despesa':
       dados = pagarDespesa(estado.dados, acao.id, acao.dataPagamento, acao.hoje);
+      break;
+    case 'reverter-pagamento-despesa':
+      dados = reverterPagamentoDespesa(estado.dados, acao.id);
       break;
     case 'pagar-parcela':
       dados = pagarParcela(estado.dados, acao.dividaId, acao.parcelaId, acao.dataPagamento, acao.hoje);

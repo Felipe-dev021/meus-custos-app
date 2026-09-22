@@ -1,4 +1,4 @@
-import type { CategoriaDespesa, Centavos, Lancamento, Receita } from './financeiro';
+import type { CategoriaDespesa, Centavos, Despesa, Lancamento, Receita } from './financeiro';
 
 export type ResumoFinanceiro = {
   receitasRecebidas: Centavos;
@@ -59,6 +59,14 @@ export function calcularResumoFinanceiro(lancamentos: readonly Lancamento[]): Re
 export function listarReceitas(lancamentos: readonly Lancamento[]): Receita[] {
   return lancamentos
     .filter((lancamento): lancamento is Receita => lancamento.tipo === 'receita')
+    .reverse()
+    .sort((primeiro, segundo) => segundo.data.localeCompare(primeiro.data));
+}
+
+/** Retorna uma nova lista, com as despesas mais recentes pela data do lançamento. */
+export function listarDespesas(lancamentos: readonly Lancamento[]): Despesa[] {
+  return lancamentos
+    .filter((lancamento): lancamento is Despesa => lancamento.tipo === 'despesa')
     .reverse()
     .sort((primeiro, segundo) => segundo.data.localeCompare(primeiro.data));
 }

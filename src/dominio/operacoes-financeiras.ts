@@ -113,6 +113,27 @@ export function pagarDespesa(
   return { ...dados, lancamentos };
 }
 
+/** Reverte o pagamento de uma despesa manual, marcando-a novamente como pendente. */
+export function reverterPagamentoDespesa(
+  dados: DadosFinanceiros,
+  id: string,
+): DadosFinanceiros {
+  const despesa = dados.lancamentos.find((lancamento) => lancamento.id === id);
+  if (!despesa || despesa.tipo !== 'despesa') throw new Error('Despesa não encontrada.');
+  if (despesa.situacao === 'pendente') return dados;
+  if (despesa.origem.tipo === 'parcela') {
+    throw new Error('O pagamento de parcelas de dívidas é gerenciado no módulo de Dívidas.');
+  }
+
+  const lancamentos = dados.lancamentos.map((lancamento): Lancamento => {
+    if (lancamento.id !== id) return lancamento;
+    const { dataPagamento: _, ...restante } = despesa;
+    return { ...restante, situacao: 'pendente' };
+  });
+  calcularResumoFinanceiro(lancamentos);
+  return { ...dados, lancamentos };
+}
+
 /** Atualiza a parcela e cria sua despesa na mesma operação, sem estado intermediário. */
 export function pagarParcela(
   dados: DadosFinanceiros,
