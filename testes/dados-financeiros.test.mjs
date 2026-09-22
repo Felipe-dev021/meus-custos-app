@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import { criarDadosDemonstracao } from '../src/dados/demonstracao.ts';
 import { categoriasDespesa, categoriasReceita } from '../src/dominio/categorias.ts';
-import { formatarMoeda, formatarData, ehDataCivil, paraDataCivil } from '../src/utilitarios/formatacao.ts';
+import { formatarMoeda, formatarData, ehDataCivil, paraDataCivil, converterRealParaCentavos, converterDataBrasileiraParaCivil } from '../src/utilitarios/formatacao.ts';
 
 test('formata reais a partir de centavos e rejeita valores imprecisos', () => {
   const normalizar = (texto) => texto.replace(/\s/g, ' ');
@@ -81,4 +81,22 @@ test('cada demonstração recebe objetos independentes e pode ser serializada', 
   assert.equal(segundo.lancamentos[0].valorCentavos, 520000);
   assert.equal(segundo.dividas[0].parcelas[0].valorCentavos, 22000);
   assert.throws(() => criarDadosDemonstracao(new Date(NaN)), RangeError);
+});
+
+test('converte texto em reais para centavos inteiros', () => {
+  assert.equal(converterRealParaCentavos('150'), 15000);
+  assert.equal(converterRealParaCentavos('150,50'), 15050);
+  assert.equal(converterRealParaCentavos('1.250,90'), 125090);
+  assert.equal(converterRealParaCentavos('R$ 99,99'), 9999);
+  assert.equal(converterRealParaCentavos('0'), null);
+  assert.equal(converterRealParaCentavos('-50'), null);
+  assert.equal(converterRealParaCentavos('abc'), null);
+  assert.equal(converterRealParaCentavos(''), null);
+});
+
+test('converte data brasileira para data civil', () => {
+  assert.equal(converterDataBrasileiraParaCivil('21/09/2026'), '2026-09-21');
+  assert.equal(converterDataBrasileiraParaCivil('2026-09-21'), '2026-09-21');
+  assert.equal(converterDataBrasileiraParaCivil('31/02/2026'), null);
+  assert.equal(converterDataBrasileiraParaCivil('data-invalida'), null);
 });

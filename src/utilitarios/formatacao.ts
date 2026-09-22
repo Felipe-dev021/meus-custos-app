@@ -42,3 +42,32 @@ export function formatarData(valor: DataCivil): string {
   const [ano, mes, dia] = valor.split('-');
   return `${dia}/${mes}/${ano}`;
 }
+
+export function converterRealParaCentavos(texto: string): Centavos | null {
+  const limpo = texto.trim().replace(/^R\$\s?/, '');
+  if (!limpo) return null;
+
+  let normalizado = limpo;
+  if (normalizado.includes(',')) {
+    normalizado = normalizado.replace(/\./g, '').replace(',', '.');
+  }
+
+  const numero = Number(normalizado);
+  if (Number.isNaN(numero) || numero <= 0) return null;
+
+  const centavos = Math.round(numero * 100);
+  return Number.isSafeInteger(centavos) && centavos > 0 ? centavos : null;
+}
+
+export function converterDataBrasileiraParaCivil(texto: string): DataCivil | null {
+  const limpo = texto.trim();
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(limpo)) {
+    const [dia, mes, ano] = limpo.split('/');
+    const civil = `${ano}-${mes}-${dia}` as DataCivil;
+    return ehDataCivil(civil) ? civil : null;
+  }
+  if (ehDataCivil(limpo)) {
+    return limpo;
+  }
+  return null;
+}
