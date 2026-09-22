@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Image, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Image, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Texto } from '@/componentes/Texto';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
@@ -31,15 +32,23 @@ const itensMenu: { id: RotaAtiva; rotulo: string; icone: string; caminho: string
 
 export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCabecalho) {
   const navegador = useRouter();
+  const insets = useSafeAreaInsets();
   const { dados, executar, salvando } = useFinanceiro();
   const { tema, cores, alternarTema } = useTema();
   const [menuAberto, definirMenuAberto] = useState(false);
+  const navegandoRef = useRef(false);
 
   function navegarPara(caminho: string, idItem?: RotaAtiva) {
     definirMenuAberto(false);
-    if (idItem !== rotaAtiva) {
-      navegador.push(caminho as any);
-    }
+    if (idItem === rotaAtiva) return;
+    if (navegandoRef.current) return;
+
+    navegandoRef.current = true;
+    navegador.push(caminho as any);
+
+    setTimeout(() => {
+      navegandoRef.current = false;
+    }, 250);
   }
 
   function sairDemonstracao() {
@@ -48,6 +57,8 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
   }
 
   const inicialPerfil = dados.perfil.nome ? dados.perfil.nome.charAt(0).toUpperCase() : 'U';
+
+  const topoDrawerComInsets = Math.max(insets.top + espacamentos.medio, espacamentos.amplo);
 
   return (
     <>
@@ -106,6 +117,7 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
             style={[
               estilos.painelDrawer,
               {
+                paddingTop: topoDrawerComInsets,
                 backgroundColor: cores.painelDrawer,
                 borderRightColor: cores.borda,
               },
@@ -235,8 +247,10 @@ const estilos = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: espacamentos.medio,
+    paddingTop: espacamentos.medio + (Platform.OS === 'android' ? 4 : 0),
+    paddingBottom: espacamentos.medio,
     marginBottom: espacamentos.pequeno,
+    minHeight: 52,
   },
   logoArea: {
     flexDirection: 'row',
@@ -284,7 +298,6 @@ const estilos = StyleSheet.create({
     height: '100%',
     borderRightWidth: 1,
     paddingHorizontal: espacamentos.grande,
-    paddingTop: espacamentos.amplo,
     paddingBottom: espacamentos.extraGrande,
     zIndex: 10,
   },

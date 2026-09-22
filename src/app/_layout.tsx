@@ -1,7 +1,7 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useMemo } from 'react';
-import { View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { AccessibilityInfo, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ProvedorFinanceiro, useFinanceiro } from '@/estado/ContextoFinanceiro';
@@ -53,11 +53,34 @@ function AppComTema() {
 function Navegacao() {
   const { demonstracaoAtiva } = useFinanceiro();
   const { cores } = useTema();
+  const [reduzirMovimento, setReduzirMovimento] = useState(false);
+
+  useEffect(() => {
+    let ativo = true;
+
+    void AccessibilityInfo.isReduceMotionEnabled().then((habilitado) => {
+      if (ativo) setReduzirMovimento(habilitado);
+    });
+
+    const inscricao = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      (habilitado) => {
+        if (ativo) setReduzirMovimento(habilitado);
+      },
+    );
+
+    return () => {
+      ativo = false;
+      inscricao?.remove();
+    };
+  }, []);
 
   return (
     <Stack
       screenOptions={{
         headerShown: false,
+        animation: reduzirMovimento ? 'none' : 'fade',
+        animationDuration: 180,
         contentStyle: { backgroundColor: cores.fundo },
       }}>
       <Stack.Screen name="index" />
@@ -66,7 +89,14 @@ function Navegacao() {
       </Stack.Protected>
       <Stack.Protected guard={demonstracaoAtiva}>
         <Stack.Screen name="(principal)" />
-        <Stack.Screen name="novo-lancamento" options={{ presentation: 'modal' }} />
+        <Stack.Screen
+          name="novo-lancamento"
+          options={{
+            presentation: 'modal',
+            animation: reduzirMovimento ? 'none' : 'slide_from_bottom',
+            animationDuration: 180,
+          }}
+        />
         <Stack.Screen name="dividas" />
         <Stack.Screen name="assistente" />
         <Stack.Screen name="perfil" />
