@@ -173,17 +173,12 @@ export default function TelaReceitas() {
           <Texto
             variante="legenda"
             style={[estilos.colunaCabecalhoDescricao, { color: cores.textoMutado }]}>
-            DESCRIÇÃO
+            TRANSAÇÃO
           </Texto>
           <Texto
             variante="legenda"
-            style={[estilos.colunaCabecalhoCategoria, { color: cores.textoMutado }]}>
-            CATEGORIA
-          </Texto>
-          <Texto
-            variante="legenda"
-            style={[estilos.colunaCabecalhoData, { color: cores.textoMutado }]}>
-            DATA / VALOR
+            style={[estilos.colunaCabecalhoValor, { color: cores.textoMutado }]}>
+            VALOR
           </Texto>
         </View>
 
@@ -215,36 +210,40 @@ export default function TelaReceitas() {
                   estilos.linhaTabela,
                   index > 0 && [estilos.separadorLinha, { borderTopColor: cores.borda }],
                 ]}>
-                <View style={estilos.colunaDescricao}>
-                  <Texto variante="corpo" style={estilos.textoDescricao}>
+                <View style={estilos.infoItemPrincipal}>
+                  <Texto
+                    variante="corpo"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={estilos.textoDescricao}>
                     {item.descricao}
                   </Texto>
-                </View>
-
-                <View style={estilos.colunaCategoria}>
-                  <View
-                    style={[
-                      estilos.tagCategoriaPill,
-                      {
-                        backgroundColor: cores.tagPill,
-                        borderColor: cores.borda,
-                      },
-                    ]}>
-                    <Texto
-                      variante="legenda"
-                      tom="secundaria"
-                      style={estilos.textoCategoriaPill}>
-                      {categoriasReceita[item.categoria] ?? item.categoria}
+                  <View style={estilos.linhaMetaItem}>
+                    <View
+                      style={[
+                        estilos.tagCategoriaPill,
+                        {
+                          backgroundColor: cores.tagPill,
+                          borderColor: cores.borda,
+                        },
+                      ]}>
+                      <Texto
+                        variante="legenda"
+                        tom="secundaria"
+                        numberOfLines={1}
+                        style={estilos.textoCategoriaPill}>
+                        {categoriasReceita[item.categoria] ?? item.categoria}
+                      </Texto>
+                    </View>
+                    <Texto variante="legenda" tom="secundaria" style={estilos.textoDataPequena}>
+                      {formatarData(item.data)}
                     </Texto>
                   </View>
                 </View>
 
-                <View style={estilos.colunaValorData}>
+                <View style={estilos.colunaValor}>
                   <Texto variante="rotulo" tom="primaria" style={estilos.textoValorVerde}>
-                    {formatarMoeda(item.valorCentavos)}
-                  </Texto>
-                  <Texto variante="legenda" tom="secundaria" style={estilos.textoDataPequena}>
-                    {formatarData(item.data)}
+                    {`+ ${formatarMoeda(item.valorCentavos)}`}
                   </Texto>
                 </View>
               </View>
@@ -310,23 +309,17 @@ const estilos = StyleSheet.create({
   cabecalhoTabela: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingBottom: espacamentos.pequeno,
     borderBottomWidth: 1,
   },
   colunaCabecalhoDescricao: {
-    flex: 1.4,
+    flex: 1,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
-  colunaCabecalhoCategoria: {
-    flex: 1.2,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-  },
-  colunaCabecalhoData: {
-    flex: 1.2,
+  colunaCabecalhoValor: {
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,
@@ -338,44 +331,49 @@ const estilos = StyleSheet.create({
   linhaTabela: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: espacamentos.medio,
   },
   separadorLinha: {
     borderTopWidth: 1,
   },
-  colunaDescricao: {
-    flex: 1.4,
-    paddingRight: 6,
+  infoItemPrincipal: {
+    flex: 1,
+    paddingRight: espacamentos.pequeno,
+    gap: 4,
   },
   textoDescricao: {
     fontWeight: '600',
     fontSize: 15,
   },
-  colunaCategoria: {
-    flex: 1.2,
-    paddingRight: 6,
+  linhaMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
   },
   tagCategoriaPill: {
     alignSelf: 'flex-start',
-    paddingHorizontal: espacamentos.medio,
-    paddingVertical: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: raios.capsula,
     borderWidth: 1,
   },
   textoCategoriaPill: {
-    fontSize: 12,
-  },
-  colunaValorData: {
-    flex: 1.2,
-    alignItems: 'flex-end',
-    gap: 2,
-  },
-  textoValorVerde: {
-    fontWeight: '700',
-    fontSize: 14,
+    fontSize: 11,
+    lineHeight: 14,
   },
   textoDataPequena: {
     fontSize: 12,
+  },
+  colunaValor: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  textoValorVerde: {
+    fontWeight: '700',
+    fontSize: 15,
   },
   areaVazia: {
     paddingVertical: espacamentos.grande,

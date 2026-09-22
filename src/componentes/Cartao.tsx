@@ -23,7 +23,7 @@ export function Cartao({ style, ...propriedades }: ViewProps) {
 
 const estilos = StyleSheet.create({
   cartao: {
-    padding: espacamentos.extraGrande,
+    padding: espacamentos.grande,
     gap: espacamentos.medio,
     borderWidth: 1,
     borderRadius: raios.medio,

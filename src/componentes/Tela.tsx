@@ -59,7 +59,8 @@ const estilos = StyleSheet.create({
     width: '100%',
     maxWidth: 640,
     alignSelf: 'center',
-    padding: espacamentos.extraGrande,
-    gap: espacamentos.extraGrande,
+    paddingHorizontal: espacamentos.grande,
+    paddingVertical: espacamentos.grande,
+    gap: espacamentos.grande,
   },
 });

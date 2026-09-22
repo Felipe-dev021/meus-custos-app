@@ -288,22 +288,17 @@ export default function TelaDespesas() {
           </Pressable>
         </View>
 
-        {/* Cabeçalho da Tabela */}
+        {/* Cabeçalho da Lista */}
         <View style={[estilos.cabecalhoTabela, { borderBottomColor: cores.borda }]}>
           <Texto
             variante="legenda"
             style={[estilos.colunaCabecalhoDescricao, { color: cores.textoMutado }]}>
-            DESCRIÇÃO
+            DESPESA
           </Texto>
           <Texto
             variante="legenda"
-            style={[estilos.colunaCabecalhoCategoria, { color: cores.textoMutado }]}>
-            CATEGORIA
-          </Texto>
-          <Texto
-            variante="legenda"
-            style={[estilos.colunaCabecalhoDataValor, { color: cores.textoMutado }]}>
-            DATA / VALOR
+            style={[estilos.colunaCabecalhoValor, { color: cores.textoMutado }]}>
+            VALOR / STATUS
           </Texto>
         </View>
 
@@ -357,10 +352,45 @@ export default function TelaDespesas() {
                     estilos.linhaTabela,
                     index > 0 && [estilos.separadorLinha, { borderTopColor: cores.borda }],
                   ]}>
-                  {/* Coluna 1: Descrição */}
-                  <View style={estilos.colunaDescricao}>
-                    <Texto variante="corpo" style={estilos.textoDescricao}>
+                  {/* Informações Principais: Descrição + Categoria e Data */}
+                  <View style={estilos.infoItemPrincipal}>
+                    <Texto
+                      variante="corpo"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={estilos.textoDescricao}>
                       {item.descricao}
+                    </Texto>
+                    <View style={estilos.linhaMetaItem}>
+                      <View
+                        style={[
+                          estilos.tagCategoriaPill,
+                          {
+                            backgroundColor: cores.tagPill,
+                            borderColor: cores.borda,
+                          },
+                        ]}>
+                        <Texto
+                          variante="legenda"
+                          tom="secundaria"
+                          numberOfLines={1}
+                          style={estilos.textoCategoriaPill}>
+                          {categoriasDespesa[item.categoria] ?? item.categoria}
+                        </Texto>
+                      </View>
+                      <Texto variante="legenda" tom="secundaria" style={estilos.textoDataPequena}>
+                        {formatarData(item.data)}
+                      </Texto>
+                    </View>
+                  </View>
+
+                  {/* Coluna Direita: Valor e Situação (Badge interativa) */}
+                  <View style={estilos.colunaAcoesValor}>
+                    <Texto
+                      variante="rotulo"
+                      tom={estaPaga ? 'padrao' : 'perigo'}
+                      style={estilos.textoValor}>
+                      {`- ${formatarMoeda(item.valorCentavos)}`}
                     </Texto>
                     <Pressable
                       accessibilityRole="button"
@@ -384,38 +414,6 @@ export default function TelaDespesas() {
                         {estaPaga ? 'Paga' : 'Pendente'}
                       </Texto>
                     </Pressable>
-                  </View>
-
-                  {/* Coluna 2: Categoria */}
-                  <View style={estilos.colunaCategoria}>
-                    <View
-                      style={[
-                        estilos.tagCategoriaPill,
-                        {
-                          backgroundColor: cores.tagPill,
-                          borderColor: cores.borda,
-                        },
-                      ]}>
-                      <Texto
-                        variante="legenda"
-                        tom="secundaria"
-                        style={estilos.textoCategoriaPill}>
-                        {categoriasDespesa[item.categoria] ?? item.categoria}
-                      </Texto>
-                    </View>
-                  </View>
-
-                  {/* Coluna 3: Valor e Data */}
-                  <View style={estilos.colunaValorData}>
-                    <Texto
-                      variante="rotulo"
-                      tom={estaPaga ? 'padrao' : 'perigo'}
-                      style={estilos.textoValor}>
-                      {`- ${formatarMoeda(item.valorCentavos)}`}
-                    </Texto>
-                    <Texto variante="legenda" tom="secundaria" style={estilos.textoDataPequena}>
-                      {formatarData(item.data)}
-                    </Texto>
                   </View>
                 </View>
               );
@@ -499,23 +497,17 @@ const estilos = StyleSheet.create({
   cabecalhoTabela: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingBottom: espacamentos.pequeno,
     borderBottomWidth: 1,
   },
   colunaCabecalhoDescricao: {
-    flex: 1.4,
+    flex: 1,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
-  colunaCabecalhoCategoria: {
-    flex: 1.1,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-  },
-  colunaCabecalhoDataValor: {
-    flex: 1.2,
+  colunaCabecalhoValor: {
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,
@@ -527,22 +519,53 @@ const estilos = StyleSheet.create({
   linhaTabela: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: espacamentos.medio,
   },
   separadorLinha: {
     borderTopWidth: 1,
   },
-  colunaDescricao: {
-    flex: 1.4,
-    paddingRight: 6,
+  infoItemPrincipal: {
+    flex: 1,
+    paddingRight: espacamentos.pequeno,
     gap: 4,
   },
   textoDescricao: {
     fontWeight: '600',
     fontSize: 15,
   },
-  badgeSituacao: {
+  linhaMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  tagCategoriaPill: {
     alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: raios.capsula,
+    borderWidth: 1,
+  },
+  textoCategoriaPill: {
+    fontSize: 11,
+    lineHeight: 14,
+  },
+  textoDataPequena: {
+    fontSize: 12,
+  },
+  colunaAcoesValor: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    gap: 4,
+    flexShrink: 0,
+  },
+  textoValor: {
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  badgeSituacao: {
+    alignSelf: 'flex-end',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
@@ -563,32 +586,6 @@ const estilos = StyleSheet.create({
     fontSize: 11,
     lineHeight: 14,
     fontWeight: '700',
-  },
-  colunaCategoria: {
-    flex: 1.1,
-    paddingRight: 6,
-  },
-  tagCategoriaPill: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: espacamentos.medio,
-    paddingVertical: 4,
-    borderRadius: raios.capsula,
-    borderWidth: 1,
-  },
-  textoCategoriaPill: {
-    fontSize: 12,
-  },
-  colunaValorData: {
-    flex: 1.2,
-    alignItems: 'flex-end',
-    gap: 2,
-  },
-  textoValor: {
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  textoDataPequena: {
-    fontSize: 12,
   },
   areaVazia: {
     paddingVertical: espacamentos.grande,

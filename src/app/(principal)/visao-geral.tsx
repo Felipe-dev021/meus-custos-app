@@ -222,19 +222,20 @@ export default function TelaVisaoGeral() {
           },
         ]}>
         <View style={estilos.cabecalhoSecaoLista}>
-          <View>
+          <View style={estilos.textosCabecalhoSecao}>
             <Texto variante="subtitulo" accessibilityRole="header">
               Lançamentos recentes
             </Texto>
-            <Texto variante="legenda" tom="secundaria">
-              Últimas movimentações registradas
+            <Texto variante="legenda" tom="secundaria" numberOfLines={1}>
+              Últimas movimentações
             </Texto>
           </View>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Ver todas as receitas"
-            onPress={() => navegador.push('/(principal)/receitas')}>
-            <Texto variante="legenda" tom="primaria">
+            onPress={() => navegador.push('/(principal)/receitas')}
+            style={estilos.botaoVerReceitas}>
+            <Texto variante="rotulo" tom="primaria" style={estilos.textoVerReceitas}>
               Ver receitas →
             </Texto>
           </Pressable>
@@ -342,6 +343,22 @@ const estilos = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: espacamentos.pequeno,
+    flexWrap: 'wrap',
+  },
+  textosCabecalhoSecao: {
+    flex: 1,
+    minWidth: 140,
+  },
+  botaoVerReceitas: {
+    alignSelf: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    flexShrink: 0,
+  },
+  textoVerReceitas: {
+    fontSize: 13,
+    fontWeight: '700',
   },
   mensagemVazia: {
     paddingVertical: espacamentos.medio,
