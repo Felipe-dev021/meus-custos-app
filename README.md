@@ -1,30 +1,50 @@
-# Meus Custos — protótipo mobile
+# Meus Custos — Mobile
 
-Projeto Expo com React Native, TypeScript e Expo Router.
-Tema escuro, componentes nativos e navegação por abas. Use “Entrar na demonstração”
-para navegar; a saída fica na aba “Mais”. As rotas internas exigem a sessão demonstrativa.
-As telas financeiras e os campos do login ainda serão implementados.
+Aplicativo mobile do sistema Meus Custos, desenvolvido com React Native, Expo e TypeScript.
 
-```sh
+---
+
+## 🚀 Como executar o projeto
+
+### Pré-requisitos
+- Node.js (versão 20 ou superior)
+- npm
+
+### 1. Instalar as dependências
+```bash
 npm install
-npm start
 ```
 
-Abra no Expo Go compatível com o SDK 57 ou pressione `w` para abrir na web.
-No PowerShell com scripts bloqueados, use `npm.cmd` no lugar de `npm`.
+### 2. Iniciar o servidor de desenvolvimento
+```bash
+npx expo start
+```
+> No Windows/PowerShell (caso haja restrição de scripts), utilize `npx.cmd expo start`.
 
-Verificações: `npm run typecheck`, `npm run lint` e `npm test` (Node.js 22.18+).
+Para visualizar o aplicativo:
+- Pressione `a` para abrir no emulador Android.
+- Pressione `i` para abrir no simulador iOS.
+- Pressione `w` para abrir no navegador web.
+- Ou escaneie o QR Code com o aplicativo **Expo Go** no seu smartphone.
 
-Os modelos ficam em `src/dominio`, os dados fictícios em `src/dados` e a formatação em
-`src/utilitarios`. Valores usam centavos inteiros e datas usam `AAAA-MM-DD`, sem horário.
-O estado compartilhado salva os dados financeiros e o perfil no aparelho com AsyncStorage.
-Não salva senha nem sessão; ao reabrir, será necessário entrar na demonstração novamente.
-As telas financeiras ainda serão conectadas ao estado. Falhas de armazenamento exibem uma opção de tentar novamente.
+---
 
-As consultas de `src/dominio/consultas-financeiras.ts` calculam o saldo com receitas recebidas
-menos despesas pagas. A previsão desconta também as despesas pendentes cadastradas;
-parcelas ainda sem lançamento não entram nessa previsão. Os gastos por categoria consideram
-apenas despesas pagas. Os totais abrangem todos os lançamentos, sem filtro de mês.
+## 🧪 Scripts e Verificações
 
-Use português nos nomes de arquivos, componentes, tipos, funções e variáveis do projeto,
-sem acentos nos identificadores. Preserve os nomes exigidos pelas bibliotecas e ferramentas.
+- **Checagem de tipos**: `npm run typecheck`
+- **Linter de código**: `npm run lint`
+- **Testes automatizados**: `npm test`
+
+---
+
+## 📁 Estrutura do Projeto
+
+- `src/app/`: Telas e navegação do aplicativo (Expo Router).
+- `src/componentes/`: Componentes visuais reutilizáveis (botões, cartões, cabeçalho, inputs, etc.).
+- `src/estado/`: Contexto e gerenciamento do estado financeiro compartilhado.
+- `src/dominio/`: Modelos, regras de negócio e cálculos financeiros.
+- `src/dados/`: Dados fictícios e persistência local (AsyncStorage).
+- `src/tema/`: Tokens de design (cores, espaçamentos e raios).
+- `assets/`: Imagens e ícones da aplicação.
+- `testes/`: Testes unitários das regras de negócio.
+
