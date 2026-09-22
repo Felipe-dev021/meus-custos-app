@@ -1,17 +1,43 @@
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 import { Texto } from '@/componentes/Texto';
 import { espacamentos } from '@/tema';
 
+const logoImagem = require('../../assets/logo.png');
+
 export function Marca() {
   return (
     <View accessible accessibilityLabel="Meus Custos" style={estilos.marca}>
-      <Texto tom="primaria" style={estilos.assinatura}>{'meus\ncustos'}</Texto>
+      <Image
+        source={logoImagem}
+        style={estilos.imagemLogo}
+        resizeMode="contain"
+        accessibilityRole="image"
+        accessibilityLabel="Ícone Meus Custos"
+      />
+      <Texto tom="primaria" style={estilos.assinatura}>
+        {'meus\ncustos'}
+      </Texto>
     </View>
   );
 }
 
 const estilos = StyleSheet.create({
-  marca: { alignSelf: 'flex-start', paddingVertical: espacamentos.minimo },
-  assinatura: { fontSize: 34, lineHeight: 32, fontWeight: '800', letterSpacing: -1.5 },
+  marca: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: espacamentos.medio,
+    alignSelf: 'flex-start',
+    paddingVertical: espacamentos.minimo,
+  },
+  imagemLogo: {
+    width: 44,
+    height: 44,
+  },
+  assinatura: {
+    fontSize: 32,
+    lineHeight: 30,
+    fontWeight: '800',
+    letterSpacing: -1,
+  },
 });

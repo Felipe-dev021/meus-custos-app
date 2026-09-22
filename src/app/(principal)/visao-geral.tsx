@@ -1,9 +1,8 @@
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Botao } from '@/componentes/Botao';
+import { CabecalhoNavegacao } from '@/componentes/CabecalhoNavegacao';
 import { Cartao } from '@/componentes/Cartao';
-import { Marca } from '@/componentes/Marca';
 import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
 import { categoriasDespesa, categoriasReceita } from '@/dominio/categorias';
@@ -27,99 +26,87 @@ export default function TelaVisaoGeral() {
 
   return (
     <Tela edges={['top', 'right', 'left']}>
-      <View style={estilos.topo}>
-        <Marca />
+      {/* Topo com Logo e Menu Hambúrguer */}
+      <CabecalhoNavegacao rotaAtiva="visao-geral" />
+
+      {/* Título e Botão de Ação rápida */}
+      <View style={estilos.cabecalhoSecao}>
+        <View style={estilos.textosTitulo}>
+          <Texto variante="titulo" accessibilityRole="header">
+            Visão geral
+          </Texto>
+          <Texto tom="secundaria">
+            Olá, {dados.perfil.nome || 'usuário'}. Acompanhe seu saldo e suas movimentações.
+          </Texto>
+        </View>
+
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Acessar perfil"
-          onPress={() => navegador.push('/perfil')}
-          style={estilos.botaoPerfilTopo}>
-          <Texto variante="rotulo" tom="primaria">
-            {dados.perfil.nome ? dados.perfil.nome.slice(0, 2).toUpperCase() : 'EU'}
+          accessibilityLabel="Cadastrar novo lançamento"
+          onPress={() => navegador.push('/novo-lancamento')}
+          style={estilos.botaoAcaoVerde}>
+          <Texto variante="rotulo" style={estilos.textoBotaoAcao}>
+            + Novo lançamento
           </Texto>
         </Pressable>
       </View>
 
-      <View style={estilos.cabecalho}>
-        <Texto variante="titulo" accessibilityRole="header">
-          Visão geral
-        </Texto>
-        <Texto tom="secundaria">
-          Olá, {dados.perfil.nome}. Acompanhe seu saldo e suas movimentações.
-        </Texto>
-      </View>
-
-      {/* Cartão principal de saldo */}
-      <Cartao style={estilos.cartaoDestaque}>
-        <Texto variante="legenda" tom="secundaria">
-          SALDO DISPONÍVEL
-        </Texto>
-        <Texto
-          variante="valor"
-          tom={resumo.saldoDisponivel >= 0 ? 'primaria' : 'perigo'}
-          accessibilityRole="text">
-          {formatarMoeda(resumo.saldoDisponivel)}
-        </Texto>
-        <Texto variante="legenda" tom="secundaria">
-          Receitas recebidas menos despesas pagas
-        </Texto>
-
-        <View style={estilos.divisor} />
-
-        <View style={estilos.linhaPrevisao}>
-          <View>
-            <Texto variante="legenda" tom="secundaria">
-              Previsão após pendências
+      {/* Grade de Cartões de Métricas (Estilo Site) */}
+      <View style={estilos.gradeMetricas}>
+        <View style={estilos.linhaMetricas}>
+          {/* Card 1: Saldo Disponível */}
+          <Cartao style={estilos.cartaoMetrica}>
+            <View style={estilos.iconeCaixa}>
+              <Texto variante="rotulo" style={estilos.simboloIcone}>💳</Texto>
+            </View>
+            <Texto variante="legenda" tom="secundaria">Saldo disponível</Texto>
+            <Texto
+              variante="subtitulo"
+              tom={resumo.saldoDisponivel >= 0 ? 'primaria' : 'perigo'}
+              style={estilos.valorMetrica}>
+              {formatarMoeda(resumo.saldoDisponivel)}
             </Texto>
-            <Texto variante="subtitulo">
+          </Cartao>
+
+          {/* Card 2: Previsão */}
+          <Cartao style={estilos.cartaoMetrica}>
+            <View style={estilos.iconeCaixa}>
+              <Texto variante="rotulo" style={estilos.simboloIcone}>📅</Texto>
+            </View>
+            <Texto variante="legenda" tom="secundaria">Previsão fim do mês</Texto>
+            <Texto variante="subtitulo" style={estilos.valorMetrica}>
               {formatarMoeda(resumo.saldoPrevisto)}
             </Texto>
-          </View>
-          {resumo.despesasPendentes > 0 && (
-            <View style={estilos.seloPendente}>
-              <Texto variante="legenda" style={estilos.textoPendente}>
-                {formatarMoeda(resumo.despesasPendentes)} a pagar
-              </Texto>
-            </View>
-          )}
+          </Cartao>
         </View>
-      </Cartao>
 
-      {/* Resumo de entradas e saídas */}
-      <View style={estilos.gridMetricas}>
-        <Cartao style={estilos.cartaoMetrica}>
-          <Texto variante="legenda" tom="secundaria">
-            RECEITAS RECEBIDAS
-          </Texto>
-          <Texto variante="subtitulo" tom="primaria">
-            {formatarMoeda(resumo.receitasRecebidas)}
-          </Texto>
-          <Texto variante="legenda" tom="secundaria">
-            Entradas quitadas
-          </Texto>
-        </Cartao>
+        <View style={estilos.linhaMetricas}>
+          {/* Card 3: Receitas */}
+          <Cartao style={estilos.cartaoMetrica}>
+            <View style={estilos.iconeCaixa}>
+              <Texto variante="rotulo" style={estilos.simboloIcone}>↗</Texto>
+            </View>
+            <Texto variante="legenda" tom="secundaria">Total de receitas</Texto>
+            <Texto variante="subtitulo" tom="primaria" style={estilos.valorMetrica}>
+              {formatarMoeda(resumo.receitasRecebidas)}
+            </Texto>
+          </Cartao>
 
-        <Cartao style={estilos.cartaoMetrica}>
-          <Texto variante="legenda" tom="secundaria">
-            DESPESAS PAGAS
-          </Texto>
-          <Texto variante="subtitulo">
-            {formatarMoeda(resumo.despesasPagas)}
-          </Texto>
-          <Texto variante="legenda" tom="secundaria">
-            Saídas realizadas
-          </Texto>
-        </Cartao>
+          {/* Card 4: Despesas pagas */}
+          <Cartao style={estilos.cartaoMetrica}>
+            <View style={estilos.iconeCaixa}>
+              <Texto variante="rotulo" style={estilos.simboloIcone}>↙</Texto>
+            </View>
+            <Texto variante="legenda" tom="secundaria">Despesas pagas</Texto>
+            <Texto variante="subtitulo" style={estilos.valorMetrica}>
+              {formatarMoeda(resumo.despesasPagas)}
+            </Texto>
+          </Cartao>
+        </View>
       </View>
 
-      {/* Ação rápida para novo lançamento */}
-      <Botao
-        titulo="+ Novo lançamento"
-        onPress={() => navegador.push('/novo-lancamento')}
-      />
-
       {/* Gastos por categoria */}
-      <Cartao>
+      <Cartao style={estilos.painel}>
         <Texto variante="subtitulo" accessibilityRole="header">
           Gastos por categoria
         </Texto>
@@ -167,14 +154,19 @@ export default function TelaVisaoGeral() {
       </Cartao>
 
       {/* Últimos lançamentos */}
-      <Cartao>
-        <View style={estilos.cabecalhoSecao}>
-          <Texto variante="subtitulo" accessibilityRole="header">
-            Últimos lançamentos
-          </Texto>
+      <Cartao style={estilos.painel}>
+        <View style={estilos.cabecalhoSecaoLista}>
+          <View>
+            <Texto variante="subtitulo" accessibilityRole="header">
+              Lançamentos recentes
+            </Texto>
+            <Texto variante="legenda" tom="secundaria">
+              Últimas movimentações registradas
+            </Texto>
+          </View>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Ver receitas"
+            accessibilityLabel="Ver todas as receitas"
             onPress={() => navegador.push('/(principal)/receitas')}>
             <Texto variante="legenda" tom="primaria">
               Ver receitas →
@@ -230,69 +222,67 @@ export default function TelaVisaoGeral() {
           </View>
         )}
       </Cartao>
-
-      <Botao
-        titulo="Meu perfil"
-        variante="secundaria"
-        onPress={() => navegador.push('/perfil')}
-      />
     </Tela>
   );
 }
 
 const estilos = StyleSheet.create({
-  topo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  cabecalhoSecao: {
+    gap: espacamentos.medio,
   },
-  botaoPerfilTopo: {
-    width: 40,
-    height: 40,
-    borderRadius: raios.capsula,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficieElevada,
-    alignItems: 'center',
-    justifyContent: 'center',
+  textosTitulo: {
+    gap: 4,
   },
-  cabecalho: {
-    gap: espacamentos.minimo,
+  botaoAcaoVerde: {
+    alignSelf: 'flex-start',
+    backgroundColor: cores.primaria,
+    paddingHorizontal: espacamentos.grande,
+    paddingVertical: espacamentos.medio - 2,
+    borderRadius: raios.pequeno,
   },
-  cartaoDestaque: {
-    borderColor: cores.borda,
-    backgroundColor: cores.superficieElevada,
+  textoBotaoAcao: {
+    color: '#001a09',
+    fontWeight: '700',
   },
-  divisor: {
-    height: 1,
-    backgroundColor: cores.borda,
-    marginVertical: espacamentos.pequeno,
+  gradeMetricas: {
+    gap: espacamentos.medio,
   },
-  linhaPrevisao: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  seloPendente: {
-    paddingHorizontal: espacamentos.medio,
-    paddingVertical: espacamentos.minimo,
-    borderRadius: raios.capsula,
-    backgroundColor: 'rgba(249, 156, 0, 0.12)',
-  },
-  textoPendente: {
-    color: cores.aviso,
-    fontWeight: '600',
-  },
-  gridMetricas: {
+  linhaMetricas: {
     flexDirection: 'row',
     gap: espacamentos.medio,
   },
   cartaoMetrica: {
     flex: 1,
     padding: espacamentos.grande,
-    gap: espacamentos.minimo,
+    gap: espacamentos.pequeno,
+    backgroundColor: '#121214',
+    borderColor: cores.borda,
   },
-  cabecalhoSecao: {
+  iconeCaixa: {
+    width: 32,
+    height: 32,
+    borderRadius: raios.pequeno - 2,
+    backgroundColor: '#1c1c1f',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  simboloIcone: {
+    fontSize: 16,
+    color: cores.texto,
+  },
+  valorMetrica: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '700',
+    color: cores.texto,
+  },
+  painel: {
+    backgroundColor: '#121214',
+    borderColor: cores.borda,
+    gap: espacamentos.medio,
+  },
+  cabecalhoSecaoLista: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

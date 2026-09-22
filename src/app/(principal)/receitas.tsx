@@ -1,16 +1,15 @@
-import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import { Botao } from '@/componentes/Botao';
+import { CabecalhoNavegacao } from '@/componentes/CabecalhoNavegacao';
 import { CampoTexto } from '@/componentes/CampoTexto';
 import { Cartao } from '@/componentes/Cartao';
-import { Marca } from '@/componentes/Marca';
 import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
 import { categoriasReceita } from '@/dominio/categorias';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
-import { cores, espacamentos } from '@/tema';
+import { cores, espacamentos, raios } from '@/tema';
 import { formatarData, formatarMoeda } from '@/utilitarios/formatacao';
 
 export default function TelaReceitas() {
@@ -34,99 +33,162 @@ export default function TelaReceitas() {
     return receitasFiltradas.reduce((total, item) => total + item.valorCentavos, 0);
   }, [busca, receitasFiltradas, resumo.receitasRecebidas]);
 
+  const mediaPorLancamento = useMemo(() => {
+    if (receitasFiltradas.length === 0) return 0;
+    return Math.round(totalExibido / receitasFiltradas.length);
+  }, [receitasFiltradas.length, totalExibido]);
+
   return (
     <Tela edges={['top', 'right', 'left']}>
-      <Marca />
+      {/* Topo com Logo e Menu Hambúrguer */}
+      <CabecalhoNavegacao rotaAtiva="receitas" />
 
-      <View style={estilos.cabecalho}>
-        <Texto variante="titulo" accessibilityRole="header">
-          Receitas
-        </Texto>
-        <Texto tom="secundaria">
-          Acompanhe suas entradas e rendimentos cadastrados.
-        </Texto>
+      {/* Título da Tela e Botão de Ação rápida */}
+      <View style={estilos.cabecalhoSecao}>
+        <View style={estilos.textosTitulo}>
+          <Texto variante="titulo" accessibilityRole="header">
+            {'Receitas (rendas)'}
+          </Texto>
+          <Texto tom="secundaria">
+            Registre e acompanhe suas entradas por data de recebimento
+          </Texto>
+        </View>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Cadastrar nova receita"
+          onPress={() => navegador.push({ pathname: '/novo-lancamento', params: { tipo: 'receita' } })}
+          style={estilos.botaoAcaoVerde}>
+          <Texto variante="rotulo" style={estilos.textoBotaoAcao}>
+            + Nova receita
+          </Texto>
+        </Pressable>
       </View>
 
-      {/* Cartão de Total Recebido */}
-      <Cartao style={estilos.cartaoTotal}>
-        <Texto variante="legenda" tom="secundaria">
-          {busca.trim() ? 'TOTAL FILTRADO' : 'TOTAL RECEBIDO'}
-        </Texto>
-        <Texto variante="valor" tom="primaria">
-          {formatarMoeda(totalExibido)}
-        </Texto>
-        <Texto variante="legenda" tom="secundaria">
-          {busca.trim()
-            ? `${receitasFiltradas.length} de ${receitas.length} receitas encontradas`
-            : `${receitas.length} receitas registradas no total`}
-        </Texto>
-      </Cartao>
+      {/* Grade de Cartões de Métricas (Igual ao site/fotos) */}
+      <View style={estilos.gradeMetricas}>
+        <View style={estilos.linhaMetricas}>
+          {/* Card 1: Total de entradas */}
+          <Cartao style={estilos.cartaoMetrica}>
+            <View style={estilos.iconeCaixa}>
+              <Texto variante="rotulo" style={estilos.simboloIcone}>$</Texto>
+            </View>
+            <Texto variante="legenda" tom="secundaria">Total de entradas</Texto>
+            <Texto variante="subtitulo" style={estilos.valorMetrica}>
+              {formatarMoeda(totalExibido)}
+            </Texto>
+          </Cartao>
 
-      {/* Botão de adicionar receita */}
-      <Botao
-        titulo="+ Adicionar receita"
-        onPress={() => navegador.push({ pathname: '/novo-lancamento', params: { tipo: 'receita' } })}
-      />
+          {/* Card 2: Receitas registradas */}
+          <Cartao style={estilos.cartaoMetrica}>
+            <View style={estilos.iconeCaixa}>
+              <Texto variante="rotulo" style={estilos.simboloIcone}>↗</Texto>
+            </View>
+            <Texto variante="legenda" tom="secundaria">Receitas registradas</Texto>
+            <Texto variante="subtitulo" style={estilos.valorMetrica}>
+              {receitasFiltradas.length}
+            </Texto>
+          </Cartao>
+        </View>
 
-      {/* Campo de busca */}
-      <CampoTexto
-        rotulo="Buscar receitas"
-        placeholder="Filtrar por descrição ou categoria..."
-        value={busca}
-        onChangeText={definirBusca}
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
+        {/* Card 3: Média por lançamento */}
+        <Cartao style={estilos.cartaoMetricaUnico}>
+          <View style={estilos.iconeCaixa}>
+            <Texto variante="rotulo" style={estilos.simboloIcone}>📅</Texto>
+          </View>
+          <Texto variante="legenda" tom="secundaria">Média por lançamento</Texto>
+          <Texto variante="subtitulo" style={estilos.valorMetrica}>
+            {formatarMoeda(mediaPorLancamento)}
+          </Texto>
+        </Cartao>
+      </View>
 
-      {/* Listagem de receitas */}
-      <Cartao>
-        <Texto variante="subtitulo" accessibilityRole="header">
-          Lista de receitas
-        </Texto>
+      {/* Painel com Tabela/Lista de Entradas */}
+      <Cartao style={estilos.painelLista}>
+        <View style={estilos.topoPainel}>
+          <View>
+            <Texto variante="subtitulo" accessibilityRole="header">
+              Entradas registradas
+            </Texto>
+            <Texto variante="legenda" tom="secundaria">
+              Ordenadas por data de recebimento
+            </Texto>
+          </View>
+        </View>
+
+        {/* Campo de Busca integrado */}
+        <CampoTexto
+          rotulo="Filtrar receitas"
+          placeholder="Buscar por descrição ou categoria..."
+          value={busca}
+          onChangeText={definirBusca}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+
+        {/* Cabeçalho da Lista / Tabela */}
+        <View style={estilos.cabecalhoTabela}>
+          <Texto variante="legenda" style={estilos.colunaCabecalhoDescricao}>
+            DESCRIÇÃO
+          </Texto>
+          <Texto variante="legenda" style={estilos.colunaCabecalhoCategoria}>
+            CATEGORIA
+          </Texto>
+          <Texto variante="legenda" style={estilos.colunaCabecalhoData}>
+            DATA / VALOR
+          </Texto>
+        </View>
 
         {receitas.length === 0 ? (
           <View style={estilos.areaVazia}>
             <Texto tom="secundaria">Nenhuma receita registrada até o momento.</Texto>
-            <Botao
-              titulo="Cadastrar primeira receita"
-              variante="secundaria"
-              onPress={() => navegador.push({ pathname: '/novo-lancamento', params: { tipo: 'receita' } })}
-              style={estilos.botaoVazio}
-            />
           </View>
         ) : receitasFiltradas.length === 0 ? (
           <View style={estilos.areaVazia}>
             <Texto tom="secundaria">
               {`Nenhuma receita encontrada para "${busca}".`}
             </Texto>
-            <Botao
-              titulo="Limpar busca"
-              variante="secundaria"
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Limpar busca"
               onPress={() => definirBusca('')}
-              style={estilos.botaoVazio}
-            />
+              style={estilos.botaoLimparBusca}>
+              <Texto variante="rotulo" tom="primaria">
+                Limpar busca
+              </Texto>
+            </Pressable>
           </View>
         ) : (
-          <View style={estilos.lista}>
+          <View style={estilos.listaItens}>
             {receitasFiltradas.map((item, index) => (
               <View
                 key={item.id}
                 style={[
-                  estilos.itemReceita,
-                  index > 0 && estilos.separadorReceita,
+                  estilos.linhaTabela,
+                  index > 0 && estilos.separadorLinha,
                 ]}>
-                <View style={estilos.infoReceita}>
-                  <Texto variante="corpo" style={estilos.descricao}>
+                <View style={estilos.colunaDescricao}>
+                  <Texto variante="corpo" style={estilos.textoDescricao}>
                     {item.descricao}
-                  </Texto>
-                  <Texto variante="legenda" tom="secundaria">
-                    {categoriasReceita[item.categoria] ?? item.categoria} · {formatarData(item.data)}
                   </Texto>
                 </View>
 
-                <Texto variante="rotulo" tom="primaria" style={estilos.valor}>
-                  + {formatarMoeda(item.valorCentavos)}
-                </Texto>
+                <View style={estilos.colunaCategoria}>
+                  <View style={estilos.tagCategoriaPill}>
+                    <Texto variante="legenda" tom="secundaria" style={estilos.textoCategoriaPill}>
+                      {categoriasReceita[item.categoria] ?? item.categoria}
+                    </Texto>
+                  </View>
+                </View>
+
+                <View style={estilos.colunaValorData}>
+                  <Texto variante="rotulo" tom="primaria" style={estilos.textoValorVerde}>
+                    {formatarMoeda(item.valorCentavos)}
+                  </Texto>
+                  <Texto variante="legenda" tom="secundaria" style={estilos.textoDataPequena}>
+                    {formatarData(item.data)}
+                  </Texto>
+                </View>
               </View>
             ))}
           </View>
@@ -137,42 +199,155 @@ export default function TelaReceitas() {
 }
 
 const estilos = StyleSheet.create({
-  cabecalho: {
-    gap: espacamentos.minimo,
-  },
-  cartaoTotal: {
-    backgroundColor: cores.superficieElevada,
-  },
-  areaVazia: {
-    paddingVertical: espacamentos.grande,
+  cabecalhoSecao: {
     gap: espacamentos.medio,
-    alignItems: 'flex-start',
   },
-  botaoVazio: {
-    marginTop: espacamentos.pequeno,
+  textosTitulo: {
+    gap: 4,
   },
-  lista: {
-    marginTop: espacamentos.pequeno,
+  botaoAcaoVerde: {
+    alignSelf: 'flex-start',
+    backgroundColor: cores.primaria,
+    paddingHorizontal: espacamentos.grande,
+    paddingVertical: espacamentos.medio - 2,
+    borderRadius: raios.pequeno,
   },
-  itemReceita: {
+  textoBotaoAcao: {
+    color: '#001a09',
+    fontWeight: '700',
+  },
+  gradeMetricas: {
+    gap: espacamentos.medio,
+  },
+  linhaMetricas: {
+    flexDirection: 'row',
+    gap: espacamentos.medio,
+  },
+  cartaoMetrica: {
+    flex: 1,
+    padding: espacamentos.grande,
+    gap: espacamentos.pequeno,
+    backgroundColor: '#121214',
+    borderColor: cores.borda,
+  },
+  cartaoMetricaUnico: {
+    padding: espacamentos.grande,
+    gap: espacamentos.pequeno,
+    backgroundColor: '#121214',
+    borderColor: cores.borda,
+  },
+  iconeCaixa: {
+    width: 32,
+    height: 32,
+    borderRadius: raios.pequeno - 2,
+    backgroundColor: '#1c1c1f',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  simboloIcone: {
+    fontSize: 16,
+    color: cores.texto,
+  },
+  valorMetrica: {
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: '700',
+    color: cores.texto,
+  },
+  painelLista: {
+    backgroundColor: '#121214',
+    gap: espacamentos.grande,
+  },
+  topoPainel: {
+    gap: 4,
+  },
+  cabecalhoTabela: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingBottom: espacamentos.pequeno,
+    borderBottomWidth: 1,
+    borderBottomColor: cores.borda,
+  },
+  colunaCabecalhoDescricao: {
+    flex: 1.4,
+    fontSize: 11,
+    color: '#71717a',
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  colunaCabecalhoCategoria: {
+    flex: 1.2,
+    fontSize: 11,
+    color: '#71717a',
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  colunaCabecalhoData: {
+    flex: 1.2,
+    fontSize: 11,
+    color: '#71717a',
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textAlign: 'right',
+  },
+  listaItens: {
+    gap: espacamentos.minimo,
+  },
+  linhaTabela: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: espacamentos.medio,
   },
-  separadorReceita: {
+  separadorLinha: {
     borderTopWidth: 1,
     borderTopColor: cores.borda,
   },
-  infoReceita: {
-    flex: 1,
-    gap: 2,
-    marginRight: espacamentos.medio,
+  colunaDescricao: {
+    flex: 1.4,
+    paddingRight: 6,
   },
-  descricao: {
+  textoDescricao: {
     fontWeight: '600',
+    fontSize: 15,
   },
-  valor: {
+  colunaCategoria: {
+    flex: 1.2,
+    paddingRight: 6,
+  },
+  tagCategoriaPill: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: espacamentos.medio,
+    paddingVertical: 4,
+    borderRadius: raios.capsula,
+    backgroundColor: '#1c1c1f',
+    borderWidth: 1,
+    borderColor: cores.borda,
+  },
+  textoCategoriaPill: {
+    fontSize: 12,
+    color: cores.textoSecundario,
+  },
+  colunaValorData: {
+    flex: 1.2,
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  textoValorVerde: {
+    color: cores.primaria,
     fontWeight: '700',
+    fontSize: 14,
+  },
+  textoDataPequena: {
+    fontSize: 12,
+  },
+  areaVazia: {
+    paddingVertical: espacamentos.grande,
+    alignItems: 'center',
+    gap: espacamentos.medio,
+  },
+  botaoLimparBusca: {
+    paddingVertical: espacamentos.pequeno,
+    paddingHorizontal: espacamentos.medio,
   },
 });

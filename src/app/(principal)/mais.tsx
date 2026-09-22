@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 
 import { Botao } from '@/componentes/Botao';
+import { CabecalhoNavegacao } from '@/componentes/CabecalhoNavegacao';
 import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
@@ -10,6 +11,7 @@ export default function Mais() {
   const { executar, salvando } = useFinanceiro();
   return (
     <Tela edges={['top', 'right', 'left']}>
+      <CabecalhoNavegacao />
       <Texto variante="titulo" accessibilityRole="header">Mais opções</Texto>
       <Texto tom="secundaria">Explore as áreas do Meus Custos.</Texto>
       <Botao titulo="Dívidas" variante="secundaria" onPress={() => navegador.push('/dividas')} />
