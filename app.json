@@ -2,9 +2,11 @@
   "expo": {
     "name": "Meus Custos",
     "slug": "meus-custos-prova",
+    "slug": "meus-custos-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "meuscustosprova",
+    "scheme": "meuscustos",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#000000",
     "web": { "output": "static" },

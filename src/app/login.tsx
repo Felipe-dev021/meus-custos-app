@@ -4,9 +4,12 @@ import { Texto } from '@/componentes/Texto';
 import { Marca } from '@/componentes/Marca';
 import { Cartao } from '@/componentes/Cartao';
 import { Tela } from '@/componentes/Tela';
+import { Botao } from '@/componentes/Botao';
+import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { cores, raios, espacamentos } from '@/tema';
 
-export default function TelaInicial() {
+export default function TelaLogin() {
+  const { executar } = useFinanceiro();
   return (
     <Tela contentContainerStyle={estilos.conteudo}>
       <Marca />
@@ -30,9 +33,11 @@ export default function TelaInicial() {
         </Texto>
         <View style={estilos.divisor} />
         <Texto variante="legenda" tom="secundaria">
-          Esta é a apresentação visual do aplicativo. As funcionalidades serão adicionadas nas próximas etapas.
+          Explore a demonstração com dados fictícios. Sem cadastro ou conexão com bancos.
         </Texto>
       </Cartao>
+
+      <Botao titulo="Entrar na demonstração" onPress={() => executar({ tipo: 'entrar-demonstracao' })} />
 
       <Texto variante="legenda" tom="secundaria" style={estilos.rodape}>
         Meus Custos · Seu controle financeiro pessoal

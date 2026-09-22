@@ -1,8 +1,9 @@
 # Meus Custos — protótipo mobile
 
 Projeto Expo com React Native, TypeScript e Expo Router.
-Tema escuro e componentes nativos reutilizáveis. A tela inicial apresenta a identidade visual;
-as telas e operações financeiras ainda serão implementadas.
+Tema escuro, componentes nativos e navegação por abas. Use “Entrar na demonstração”
+para navegar; a saída fica na aba “Mais”. As rotas internas exigem a sessão demonstrativa.
+As telas financeiras e os campos do login ainda serão implementados.
 
 ```sh
 npm install
