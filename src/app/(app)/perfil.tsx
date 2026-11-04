@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
-import { useRouter } from 'expo-router';
 
 import { Botao } from '@/componentes/Botao';
 import { CabecalhoNavegacao } from '@/componentes/CabecalhoNavegacao';
@@ -9,6 +9,7 @@ import { CampoTexto } from '@/componentes/CampoTexto';
 import { Cartao } from '@/componentes/Cartao';
 import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
+import { useAuth } from '@/contexto/AuthContext';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { espacamentos, raios } from '@/tema';
 import { useTema } from '@/tema/ContextoTema';
@@ -20,6 +21,7 @@ type ErrosFormulario = {
 
 export default function TelaPerfil() {
   const navegador = useRouter();
+  const { logout } = useAuth();
   const { dados, executar, salvando } = useFinanceiro();
   const { cores } = useTema();
 
@@ -69,15 +71,17 @@ export default function TelaPerfil() {
 
   function confirmarSaida() {
     Alert.alert(
-      'Encerrar sessão demonstrativa',
-      'Deseja sair da demonstração? Seus dados salvos neste aparelho serão preservados e restaurados quando você acessar novamente.',
+      'Encerrar sessão',
+      'Deseja sair da sua conta? Seus dados salvos neste aparelho serão preservados e restaurados quando você acessar novamente.',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
-          text: 'Sair da demonstração',
+          text: 'Sair',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             executar({ tipo: 'sair-demonstracao' });
+            await logout();
+            navegador.replace('/(auth)/login');
           },
         },
       ],
@@ -115,7 +119,7 @@ export default function TelaPerfil() {
             Meu Perfil
           </Texto>
           <Texto tom="secundaria">
-            Gerencie seus dados e configurações da demonstração
+            Gerencie seus dados e configurações da conta
           </Texto>
         </View>
       </View>
@@ -151,7 +155,7 @@ export default function TelaPerfil() {
               },
             ]}>
             <Texto variante="legenda" tom="primaria" style={estilos.textoBadgeSessao}>
-              ● Acesso Demonstrativo Ativo
+              ● Sessão Ativa
             </Texto>
           </View>
         </View>
@@ -229,7 +233,7 @@ export default function TelaPerfil() {
         />
       </Cartao>
 
-      {/* Cartão Informativo: Sobre a Demonstração */}
+      {/* Cartão Informativo */}
       <Cartao
         style={[
           estilos.cartaoInfo,
@@ -239,7 +243,7 @@ export default function TelaPerfil() {
           },
         ]}>
         <Texto variante="subtitulo" accessibilityRole="header">
-          Sobre a Demonstração
+          Sobre o Aplicativo
         </Texto>
 
         <View style={estilos.listaItensInfo}>
@@ -263,7 +267,7 @@ export default function TelaPerfil() {
               </Texto>
             </View>
             <Texto variante="legenda" tom="secundaria" style={estilos.textoItemInfo}>
-              Nenhuma credencial ou senha é enviada para a internet ou salva no sistema.
+              Nenhuma credencial ou senha é enviada para a internet ou salva em servidores externos.
             </Texto>
           </View>
 
@@ -275,13 +279,13 @@ export default function TelaPerfil() {
               </Texto>
             </View>
             <Texto variante="legenda" tom="secundaria" style={estilos.textoItemInfo}>
-              Meus Custos Mobile · Versão 1.0.0 (Demonstração)
+              Meus Custos Mobile · Versão 1.0.0
             </Texto>
           </View>
         </View>
       </Cartao>
 
-      {/* Encerramento de Sessão */}
+      {/* Encerramento de Sessão com Botão Sair */}
       <Cartao
         style={[
           estilos.cartaoSaida,
@@ -292,15 +296,15 @@ export default function TelaPerfil() {
         ]}>
         <View style={estilos.topoSaida}>
           <Texto variante="subtitulo" tom="perigo">
-            Sair da Demonstração
+            Sair da Conta
           </Texto>
           <Texto variante="legenda" tom="secundaria">
-            Encerre a sessão demonstrativa atual e retorne à tela de login. Os dados salvos localmente não serão apagados.
+            Encerre a sessão atual e retorne à tela de login. Os dados salvos localmente não serão apagados.
           </Texto>
         </View>
 
         <Botao
-          titulo="Encerrar sessão"
+          titulo="Sair"
           variante="secundaria"
           disabled={salvando}
           onPress={confirmarSaida}

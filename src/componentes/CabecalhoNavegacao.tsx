@@ -5,6 +5,7 @@ import { Image, Modal, Platform, Pressable, StyleSheet, View } from 'react-nativ
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Texto } from '@/componentes/Texto';
+import { useAuth } from '@/contexto/AuthContext';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { espacamentos, raios } from '@/tema';
 import { useTema } from '@/tema/ContextoTema';
@@ -39,6 +40,7 @@ const itensMenu: {
 export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCabecalho) {
   const navegador = useRouter();
   const insets = useSafeAreaInsets();
+  const { logout } = useAuth();
   const { dados, executar, salvando } = useFinanceiro();
   const { tema, cores, alternarTema } = useTema();
   const [menuAberto, definirMenuAberto] = useState(false);
@@ -57,9 +59,11 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
     }, 250);
   }
 
-  function sairDemonstracao() {
+  async function sairDemonstracao() {
     definirMenuAberto(false);
     executar({ tipo: 'sair-demonstracao' });
+    await logout();
+    navegador.replace('/(auth)/login');
   }
 
   const inicialPerfil = dados.perfil.nome ? dados.perfil.nome.charAt(0).toUpperCase() : 'U';
@@ -401,3 +405,4 @@ const estilos = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+

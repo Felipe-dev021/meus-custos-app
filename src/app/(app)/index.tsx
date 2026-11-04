@@ -227,7 +227,7 @@ export default function TelaVisaoGeral() {
               Lançamentos recentes
             </Texto>
             <Texto variante="legenda" tom="secundaria" numberOfLines={1}>
-              Últimas movimentações
+              Toque em um item para abrir os detalhes
             </Texto>
           </View>
           <Pressable
@@ -252,11 +252,17 @@ export default function TelaVisaoGeral() {
               const estaPaga = ehReceita || item.situacao === 'paga';
 
               return (
-                <View
+                <Pressable
                   key={item.id}
-                  style={[
+                  accessibilityRole="button"
+                  accessibilityLabel={`Ver detalhes do lançamento ${item.descricao}`}
+                  onPress={() =>
+                    navegador.push({ pathname: '/(app)/[id]', params: { id: item.id } })
+                  }
+                  style={({ pressed }) => [
                     estilos.itemLancamento,
                     index > 0 && [estilos.separadorLancamento, { borderTopColor: cores.borda }],
+                    pressed && { opacity: 0.7 },
                   ]}>
                   <View style={estilos.infoLancamento}>
                     <Texto variante="corpo" style={estilos.descricaoLancamento}>
@@ -278,14 +284,21 @@ export default function TelaVisaoGeral() {
                     </View>
                   </View>
 
-                  <Texto
-                    variante="rotulo"
-                    tom={ehReceita ? 'primaria' : estaPaga ? 'padrao' : 'secundaria'}
-                    style={estilos.valorLancamento}>
-                    {ehReceita ? '+ ' : '- '}
-                    {formatarMoeda(item.valorCentavos)}
-                  </Texto>
-                </View>
+                  <View style={estilos.colunaValorLancamento}>
+                    <Texto
+                      variante="rotulo"
+                      tom={ehReceita ? 'primaria' : estaPaga ? 'padrao' : 'secundaria'}
+                      style={estilos.valorLancamento}>
+                      {ehReceita ? '+ ' : '- '}
+                      {formatarMoeda(item.valorCentavos)}
+                    </Texto>
+                    <Ionicons
+                      name="chevron-forward-outline"
+                      size={14}
+                      color={cores.textoSecundario}
+                    />
+                  </View>
+                </Pressable>
               );
             })}
           </View>
@@ -427,6 +440,11 @@ const estilos = StyleSheet.create({
     fontSize: 11,
     lineHeight: 14,
     fontWeight: '600',
+  },
+  colunaValorLancamento: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   valorLancamento: {
     fontWeight: '700',
