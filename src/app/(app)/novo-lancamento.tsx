@@ -114,7 +114,7 @@ export default function TelaNovoLancamento() {
       if (navegador.canGoBack()) {
         navegador.back();
       } else {
-        navegador.replace('/(principal)/visao-geral');
+        navegador.replace('/');
       }
     } catch (erro) {
       definirErros({
@@ -132,7 +132,7 @@ export default function TelaNovoLancamento() {
         variante="secundaria"
         onPress={() => {
           if (navegador.canGoBack()) navegador.back();
-          else navegador.replace('/(principal)/visao-geral');
+          else navegador.replace('/');
         }}
         style={estilos.botaoVoltar}
       />

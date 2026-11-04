@@ -58,7 +58,7 @@ export function TelaEmBreve({
         <Botao
           titulo="Ir para Visão geral"
           variante="secundaria"
-          onPress={() => navegador.replace('/(principal)/visao-geral')}
+          onPress={() => navegador.replace('/')}
         />
       </Cartao>
     </Tela>

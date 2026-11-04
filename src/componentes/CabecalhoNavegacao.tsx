@@ -29,9 +29,9 @@ const itensMenu: {
   icone: keyof typeof Ionicons.glyphMap;
   caminho: string;
 }[] = [
-  { id: 'visao-geral', rotulo: 'Dashboard', icone: 'grid-outline', caminho: '/(principal)/visao-geral' },
-  { id: 'receitas', rotulo: 'Receitas', icone: 'trending-up-outline', caminho: '/(principal)/receitas' },
-  { id: 'despesas', rotulo: 'Despesas', icone: 'card-outline', caminho: '/(principal)/despesas' },
+  { id: 'visao-geral', rotulo: 'Dashboard', icone: 'grid-outline', caminho: '/' },
+  { id: 'receitas', rotulo: 'Receitas', icone: 'trending-up-outline', caminho: '/receitas' },
+  { id: 'despesas', rotulo: 'Despesas', icone: 'card-outline', caminho: '/despesas' },
   { id: 'dividas', rotulo: 'Dívidas', icone: 'business-outline', caminho: '/dividas' },
   { id: 'assistente', rotulo: 'Assistente IA', icone: 'sparkles-outline', caminho: '/assistente' },
 ];
@@ -73,7 +73,7 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Meus Custos - Início"
-          onPress={() => navegarPara('/(principal)/visao-geral', 'visao-geral')}
+          onPress={() => navegarPara('/', 'visao-geral')}
           style={estilos.logoArea}>
           <Image
             source={logoImagem}

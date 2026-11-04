@@ -233,7 +233,7 @@ export default function TelaVisaoGeral() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Ver todas as receitas"
-            onPress={() => navegador.push('/(principal)/receitas')}
+            onPress={() => navegador.push('/receitas')}
             style={estilos.botaoVerReceitas}>
             <Texto variante="rotulo" tom="primaria" style={estilos.textoVerReceitas}>
               Ver receitas →

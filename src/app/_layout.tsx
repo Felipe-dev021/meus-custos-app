@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AccessibilityInfo, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { ProvedorFinanceiro, useFinanceiro } from '@/estado/ContextoFinanceiro';
+import { ProvedorFinanceiro } from '@/estado/ContextoFinanceiro';
 import { ProvedorTema, useTema } from '@/tema/ContextoTema';
 
 export default function LayoutRaiz() {
@@ -51,7 +51,6 @@ function AppComTema() {
 }
 
 function Navegacao() {
-  const { demonstracaoAtiva } = useFinanceiro();
   const { cores } = useTema();
   const [reduzirMovimento, setReduzirMovimento] = useState(false);
 
@@ -83,24 +82,8 @@ function Navegacao() {
         animationDuration: 180,
         contentStyle: { backgroundColor: cores.fundo },
       }}>
-      <Stack.Screen name="index" />
-      <Stack.Protected guard={!demonstracaoAtiva}>
-        <Stack.Screen name="login" />
-      </Stack.Protected>
-      <Stack.Protected guard={demonstracaoAtiva}>
-        <Stack.Screen name="(principal)" />
-        <Stack.Screen
-          name="novo-lancamento"
-          options={{
-            presentation: 'modal',
-            animation: reduzirMovimento ? 'none' : 'slide_from_bottom',
-            animationDuration: 180,
-          }}
-        />
-        <Stack.Screen name="dividas" />
-        <Stack.Screen name="assistente" />
-        <Stack.Screen name="perfil" />
-      </Stack.Protected>
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(app)" />
     </Stack>
   );
 }

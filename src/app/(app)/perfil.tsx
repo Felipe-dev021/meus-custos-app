@@ -100,7 +100,7 @@ export default function TelaPerfil() {
             if (navegador.canGoBack()) {
               navegador.back();
             } else {
-              navegador.replace('/(principal)/visao-geral');
+              navegador.replace('/');
             }
           }}
           style={estilos.botaoVoltar}>
