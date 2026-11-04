@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Botao } from '@/componentes/Botao';
@@ -7,12 +8,14 @@ import { Cartao } from '@/componentes/Cartao';
 import { Marca } from '@/componentes/Marca';
 import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
+import { useAuth } from '@/contexto/AuthContext';
 import { temErrosLogin, validarCredenciaisLogin, type ErrosLogin } from '@/dominio/validacao-login';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { espacamentos, raios } from '@/tema';
 import { useTema } from '@/tema/ContextoTema';
 
 export default function TelaLogin() {
+  const { login, estaAutenticado } = useAuth();
   const { executar, salvando } = useFinanceiro();
   const { cores } = useTema();
 
@@ -20,7 +23,13 @@ export default function TelaLogin() {
   const [senha, definirSenha] = useState('');
   const [erros, definirErros] = useState<ErrosLogin>({});
 
-  function aoEntrar() {
+  useEffect(() => {
+    if (estaAutenticado) {
+      router.replace('/');
+    }
+  }, [estaAutenticado]);
+
+  async function aoEntrar() {
     const novosErros = validarCredenciaisLogin(email, senha);
     if (temErrosLogin(novosErros)) {
       definirErros(novosErros);
@@ -29,11 +38,15 @@ export default function TelaLogin() {
 
     definirErros({});
     executar({ tipo: 'entrar-demonstracao' });
+    await login(email, senha);
+    router.replace('/');
   }
 
-  function aoEntrarDemonstracao() {
+  async function aoEntrarDemonstracao() {
     definirErros({});
     executar({ tipo: 'entrar-demonstracao' });
+    await login('demo@exemplo.com');
+    router.replace('/');
   }
 
   function alterarEmail(valor: string) {

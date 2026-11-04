@@ -1,6 +1,31 @@
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
+
+import { useAuth } from '@/contexto/AuthContext';
+import { useTema } from '@/tema/ContextoTema';
 
 export default function LayoutApp() {
+  const { estaAutenticado, carregando } = useAuth();
+  const { cores } = useTema();
+
+  if (carregando) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: cores.fundo,
+        }}>
+        <ActivityIndicator size="large" color={cores.primaria} />
+      </View>
+    );
+  }
+
+  if (!estaAutenticado) {
+    return <Redirect href="/(auth)/login" />;
+  }
+
   return (
     <Stack
       screenOptions={{
