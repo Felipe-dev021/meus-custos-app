@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AccessibilityInfo, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AuthProvider } from '@/contexto/AuthContext';
 import { ProvedorFinanceiro } from '@/estado/ContextoFinanceiro';
 import { ProvedorTema, useTema } from '@/tema/ContextoTema';
 
@@ -11,9 +12,11 @@ export default function LayoutRaiz() {
   return (
     <SafeAreaProvider>
       <ProvedorTema>
-        <ProvedorFinanceiro>
-          <AppComTema />
-        </ProvedorFinanceiro>
+        <AuthProvider>
+          <ProvedorFinanceiro>
+            <AppComTema />
+          </ProvedorFinanceiro>
+        </AuthProvider>
       </ProvedorTema>
     </SafeAreaProvider>
   );
