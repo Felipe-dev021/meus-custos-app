@@ -45,7 +45,11 @@ export default function LayoutApp() {
           tabBarLabel: 'Início',
           tabBarAccessibilityLabel: 'Aba Início',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size ?? 22} color={color} />
+            <Ionicons
+              name="home-outline"
+              size={size ?? 22}
+              color={typeof color === 'string' ? color : undefined}
+            />
           ),
         }}
       />
@@ -56,7 +60,11 @@ export default function LayoutApp() {
           tabBarLabel: 'Perfil',
           tabBarAccessibilityLabel: 'Aba Perfil',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size ?? 22} color={color} />
+            <Ionicons
+              name="person-outline"
+              size={size ?? 22}
+              color={typeof color === 'string' ? color : undefined}
+            />
           ),
         }}
       />

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import type { ElementRef } from 'react';
 import { useMemo, useRef, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
@@ -25,7 +26,7 @@ export default function TelaAssistente() {
     obterMensagemInicial(dados.perfil.nome),
   ]);
   const [textoEntrada, definirTextoEntrada] = useState('');
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ElementRef<typeof ScrollView>>(null);
   const contadorRef = useRef(1);
 
   const contextoDados = useMemo<ContextoDadosAssistente>(
