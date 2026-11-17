@@ -235,6 +235,31 @@ export default function TelaNovoLancamento() {
           erro={erros.valor}
         />
 
+        {/* Atalhos Rápidos de Valor */}
+        <View style={estilos.linhaAtalhosValor}>
+          {[50, 100, 250, 500].map((v) => (
+            <Pressable
+              key={v}
+              accessibilityRole="button"
+              accessibilityLabel={`Preencher valor R$ ${v},00`}
+              onPress={() => {
+                definirValorTexto(`${v},00`);
+                if (erros.valor) definirErros((ant) => ({ ...ant, valor: undefined }));
+              }}
+              style={[
+                estilos.chipAtalhoValor,
+                {
+                  backgroundColor: cores.superficieElevada,
+                  borderColor: cores.borda,
+                },
+              ]}>
+              <Texto variante="legenda" tom="primaria">
+                R$ {v}
+              </Texto>
+            </Pressable>
+          ))}
+        </View>
+
         {/* Seletor de Categorias */}
         <View style={estilos.secaoCampo}>
           <Texto variante="rotulo">Categoria</Texto>
@@ -418,5 +443,16 @@ const estilos = StyleSheet.create({
   },
   botaoSalvar: {
     marginTop: espacamentos.medio,
+  },
+  linhaAtalhosValor: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: espacamentos.pequeno,
+  },
+  chipAtalhoValor: {
+    paddingHorizontal: espacamentos.medio,
+    paddingVertical: 5,
+    borderRadius: raios.capsula,
+    borderWidth: 1,
   },
 });
