@@ -4,6 +4,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  useWindowDimensions,
   View,
   type StyleProp,
   type ViewStyle,
@@ -26,6 +27,8 @@ export function Tela({
   contentContainerStyle,
 }: PropriedadesTela) {
   const { cores } = useTema();
+  const { width } = useWindowDimensions();
+  const paddingHorizontalResponsivo = width < 380 ? espacamentos.medio : espacamentos.grande;
 
   return (
     <SafeAreaView
@@ -36,13 +39,24 @@ export function Tela({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         {rolagem ? (
           <ScrollView
-            contentContainerStyle={[estilos.conteudo, contentContainerStyle]}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[
+              estilos.conteudo,
+              { paddingHorizontal: paddingHorizontalResponsivo },
+              contentContainerStyle,
+            ]}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag">
             {children}
           </ScrollView>
         ) : (
-          <View style={[estilos.conteudo, estilos.flex, contentContainerStyle]}>
+          <View
+            style={[
+              estilos.conteudo,
+              estilos.flex,
+              { paddingHorizontal: paddingHorizontalResponsivo },
+              contentContainerStyle,
+            ]}>
             {children}
           </View>
         )}
@@ -57,10 +71,10 @@ const estilos = StyleSheet.create({
   conteudo: {
     flexGrow: 1,
     width: '100%',
-    maxWidth: 640,
+    maxWidth: 680,
     alignSelf: 'center',
-    paddingHorizontal: espacamentos.grande,
-    paddingVertical: espacamentos.grande,
+    paddingTop: espacamentos.grande,
+    paddingBottom: espacamentos.amplo,
     gap: espacamentos.grande,
   },
 });
