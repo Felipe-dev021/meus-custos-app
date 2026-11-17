@@ -16,6 +16,7 @@ import { useTema } from '@/tema/ContextoTema';
 import { formatarData, formatarMoeda, paraDataCivil } from '@/utilitarios/formatacao';
 
 type FiltroSituacao = 'todas' | 'pagas' | 'pendentes';
+type OrdenacaoDespesa = 'recentes' | 'maior-valor' | 'menor-valor';
 
 export default function TelaDespesas() {
   const navegador = useRouter();
@@ -24,6 +25,7 @@ export default function TelaDespesas() {
 
   const [busca, definirBusca] = useState('');
   const [filtro, definirFiltro] = useState<FiltroSituacao>('todas');
+  const [ordenacao, definirOrdenacao] = useState<OrdenacaoDespesa>('recentes');
 
   const contagemPagas = useMemo(
     () => despesas.filter((item) => item.situacao === 'paga').length,
@@ -37,7 +39,7 @@ export default function TelaDespesas() {
   const despesasFiltradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
 
-    return despesas.filter((item) => {
+    const filtradas = despesas.filter((item) => {
       // Filtro de situação
       if (filtro === 'pagas' && item.situacao !== 'paga') return false;
       if (filtro === 'pendentes' && item.situacao !== 'pendente') return false;
@@ -48,7 +50,15 @@ export default function TelaDespesas() {
       const descricao = item.descricao.toLowerCase();
       return descricao.includes(termo) || nomeCategoria.includes(termo);
     });
-  }, [despesas, busca, filtro]);
+
+    if (ordenacao === 'maior-valor') {
+      return [...filtradas].sort((a, b) => b.valorCentavos - a.valorCentavos);
+    }
+    if (ordenacao === 'menor-valor') {
+      return [...filtradas].sort((a, b) => a.valorCentavos - b.valorCentavos);
+    }
+    return filtradas;
+  }, [despesas, busca, filtro, ordenacao]);
 
   const totalExibido = useMemo(() => {
     return despesasFiltradas.reduce((total, item) => total + item.valorCentavos, 0);
@@ -286,6 +296,43 @@ export default function TelaDespesas() {
               {`Pendentes (${contagemPendentes})`}
             </Texto>
           </Pressable>
+        </View>
+
+        {/* Barra de Ordenação */}
+        <View style={estilos.linhaOrdenacao}>
+          <Texto variante="legenda" tom="secundaria">Ordenar:</Texto>
+          {(
+            [
+              { id: 'recentes', rotulo: 'Mais recentes' },
+              { id: 'maior-valor', rotulo: 'Maior valor' },
+              { id: 'menor-valor', rotulo: 'Menor valor' },
+            ] as const
+          ).map((opcao) => {
+            const ativo = ordenacao === opcao.id;
+            return (
+              <Pressable
+                key={opcao.id}
+                accessibilityRole="button"
+                accessibilityState={{ selected: ativo }}
+                onPress={() => definirOrdenacao(opcao.id)}
+                style={[
+                  estilos.chipOrdenacao,
+                  {
+                    backgroundColor: ativo ? cores.superficieElevada : 'transparent',
+                    borderColor: ativo ? cores.primaria : cores.borda,
+                  },
+                ]}>
+                <Texto
+                  variante="legenda"
+                  style={{
+                    color: ativo ? cores.primaria : cores.textoSecundario,
+                    fontWeight: ativo ? '600' : '400',
+                  }}>
+                  {opcao.rotulo}
+                </Texto>
+              </Pressable>
+            );
+          })}
         </View>
 
         {/* Cabeçalho da Lista */}
@@ -595,5 +642,17 @@ const estilos = StyleSheet.create({
   botaoLimparBusca: {
     paddingVertical: espacamentos.pequeno,
     paddingHorizontal: espacamentos.medio,
+  },
+  linhaOrdenacao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: espacamentos.pequeno,
+  },
+  chipOrdenacao: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: raios.capsula,
+    borderWidth: 1,
   },
 });
