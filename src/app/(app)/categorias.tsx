@@ -183,7 +183,9 @@ export default function TelaCategorias() {
             <Texto variante="legenda" tom="secundaria">
               Total Orçado
             </Texto>
-            <Texto variante="valor">{formatarMoeda(resumo.totalOrcadoCentavos)}</Texto>
+            <Texto variante="valor" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+              {formatarMoeda(resumo.totalOrcadoCentavos)}
+            </Texto>
           </View>
 
           <View style={estilos.divisorVertical} />
@@ -194,6 +196,9 @@ export default function TelaCategorias() {
             </Texto>
             <Texto
               variante="valor"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
               style={{
                 color:
                   resumo.totalGastoCentavos > resumo.totalOrcadoCentavos
@@ -522,8 +527,10 @@ const estilos = StyleSheet.create({
   },
   topoItem: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 6,
     marginBottom: 4,
   },
   nomeCategoria: {
@@ -538,13 +545,17 @@ const estilos = StyleSheet.create({
   },
   linhaValoresItem: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 6,
   },
   rodapeItem: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 6,
     marginTop: 4,
   },
   botaoAjustar: {
