@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
-import { Botao } from '@/componentes/Botao';
 import { CabecalhoNavegacao } from '@/componentes/CabecalhoNavegacao';
 import { Cartao } from '@/componentes/Cartao';
 import { Tela } from '@/componentes/Tela';

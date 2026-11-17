@@ -5,7 +5,6 @@ import {
   Alert,
   Modal,
   Pressable,
-  ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
@@ -19,7 +18,6 @@ import { Texto } from '@/componentes/Texto';
 import type { CategoriaDespesa } from '@/dominio/financeiro';
 import {
   CHAVE_STORAGE_ORCAMENTOS,
-  LIMITES_PADRAO_CATEGORIAS,
   calcularStatusOrcamentos,
   type StatusOrcamento,
 } from '@/dominio/orcamentos';
@@ -45,7 +43,6 @@ export default function TelaCategorias() {
   const { cores } = useTema();
 
   const [limites, definirLimites] = useState<Partial<Record<CategoriaDespesa, number>>>({});
-  const [carregandoLimites, definirCarregandoLimites] = useState(true);
 
   // Estado do Modal de Edição de Limite
   const [categoriaEditando, definirCategoriaEditando] = useState<StatusOrcamento | null>(null);
@@ -62,8 +59,6 @@ export default function TelaCategorias() {
         }
       } catch (err) {
         console.warn('Erro ao carregar orçamentos do storage:', err);
-      } finally {
-        definirCarregandoLimites(false);
       }
     }
     carregarLimitesSalvos();

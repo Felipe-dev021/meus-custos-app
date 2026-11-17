@@ -15,13 +15,11 @@ import {
   type ErrosRegistro,
 } from '@/dominio/validacao-registro';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
-import { espacamentos, raios } from '@/tema';
-import { useTema } from '@/tema/ContextoTema';
+import { espacamentos } from '@/tema';
 
 export default function TelaRegistro() {
   const { cadastrar, estaAutenticado } = useAuth();
   const { executar, salvando } = useFinanceiro();
-  const { cores } = useTema();
 
   const [nome, definirNome] = useState('');
   const [email, definirEmail] = useState('');
