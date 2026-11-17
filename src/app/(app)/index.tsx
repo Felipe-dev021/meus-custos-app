@@ -149,6 +149,36 @@ export default function TelaVisaoGeral() {
         </View>
       </View>
 
+      {/* Atalhos Rápidos das Funcionalidades da P2 */}
+      <View style={estilos.linhaAtalhos}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Acessar Câmbio e Cotações em Tempo Real"
+          onPress={() => navegador.push('/cotacoes')}
+          style={[estilos.cardAtalho, { backgroundColor: cores.superficieElevada, borderColor: cores.borda }]}>
+          <Ionicons name="cash-outline" size={18} color={cores.primaria} />
+          <Texto variante="rotulo" style={estilos.textoCardAtalho}>Câmbio API</Texto>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Acessar Relatórios e Balanço Mensal"
+          onPress={() => navegador.push('/relatorios')}
+          style={[estilos.cardAtalho, { backgroundColor: cores.superficieElevada, borderColor: cores.borda }]}>
+          <Ionicons name="bar-chart-outline" size={18} color={cores.primaria} />
+          <Texto variante="rotulo" style={estilos.textoCardAtalho}>Relatórios</Texto>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Acessar Categorias e Metas de Gastos"
+          onPress={() => navegador.push('/categorias')}
+          style={[estilos.cardAtalho, { backgroundColor: cores.superficieElevada, borderColor: cores.borda }]}>
+          <Ionicons name="pricetags-outline" size={18} color={cores.primaria} />
+          <Texto variante="rotulo" style={estilos.textoCardAtalho}>Metas</Texto>
+        </Pressable>
+      </View>
+
       {/* Gastos por categoria */}
       <Cartao
         style={[
@@ -326,6 +356,25 @@ const estilos = StyleSheet.create({
   },
   gradeMetricas: {
     gap: espacamentos.medio,
+  },
+  linhaAtalhos: {
+    flexDirection: 'row',
+    gap: espacamentos.pequeno,
+  },
+  cardAtalho: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: espacamentos.medio - 2,
+    paddingHorizontal: 8,
+    borderRadius: raios.pequeno,
+    borderWidth: 1,
+  },
+  textoCardAtalho: {
+    fontSize: 13,
+    fontWeight: '600',
   },
   linhaMetricas: {
     flexDirection: 'row',
