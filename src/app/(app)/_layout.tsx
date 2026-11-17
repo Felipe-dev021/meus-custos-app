@@ -111,6 +111,13 @@ export default function LayoutApp() {
         }}
       />
       <Tabs.Screen
+        name="cotacoes"
+        options={{
+          href: null,
+          title: 'Cotações',
+        }}
+      />
+      <Tabs.Screen
         name="mais"
         options={{
           href: null,

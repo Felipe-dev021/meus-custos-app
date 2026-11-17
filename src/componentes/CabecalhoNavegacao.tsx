@@ -18,6 +18,7 @@ export type RotaAtiva =
   | 'despesas'
   | 'dividas'
   | 'assistente'
+  | 'cotacoes'
   | 'perfil';
 
 type PropriedadesCabecalho = {
@@ -34,6 +35,7 @@ const itensMenu: {
   { id: 'receitas', rotulo: 'Receitas', icone: 'trending-up-outline', caminho: '/receitas' },
   { id: 'despesas', rotulo: 'Despesas', icone: 'card-outline', caminho: '/despesas' },
   { id: 'dividas', rotulo: 'Dívidas', icone: 'business-outline', caminho: '/dividas' },
+  { id: 'cotacoes', rotulo: 'Câmbio & Cotações', icone: 'cash-outline', caminho: '/cotacoes' },
   { id: 'assistente', rotulo: 'Assistente IA', icone: 'sparkles-outline', caminho: '/assistente' },
 ];
 
