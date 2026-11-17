@@ -76,6 +76,8 @@ export default function TelaVisaoGeral() {
               variante="subtitulo"
               tom={resumo.saldoDisponivel >= 0 ? 'primaria' : 'perigo'}
               numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
               style={estilos.valorMetrica}>
               {formatarMoeda(resumo.saldoDisponivel)}
             </Texto>
@@ -97,6 +99,8 @@ export default function TelaVisaoGeral() {
             <Texto
               variante="subtitulo"
               numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
               style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(resumo.saldoPrevisto)}
             </Texto>
@@ -121,6 +125,8 @@ export default function TelaVisaoGeral() {
               variante="subtitulo"
               tom="primaria"
               numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
               style={estilos.valorMetrica}>
               {formatarMoeda(resumo.receitasRecebidas)}
             </Texto>
@@ -142,6 +148,8 @@ export default function TelaVisaoGeral() {
             <Texto
               variante="subtitulo"
               numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
               style={[estilos.valorMetrica, { color: cores.texto }]}>
               {formatarMoeda(resumo.despesasPagas)}
             </Texto>
@@ -157,7 +165,9 @@ export default function TelaVisaoGeral() {
           onPress={() => navegador.push('/cotacoes')}
           style={[estilos.cardAtalho, { backgroundColor: cores.superficieElevada, borderColor: cores.borda }]}>
           <Ionicons name="cash-outline" size={18} color={cores.primaria} />
-          <Texto variante="rotulo" style={estilos.textoCardAtalho}>Câmbio API</Texto>
+          <Texto variante="rotulo" numberOfLines={1} adjustsFontSizeToFit style={estilos.textoCardAtalho}>
+            Câmbio API
+          </Texto>
         </Pressable>
 
         <Pressable
@@ -166,7 +176,9 @@ export default function TelaVisaoGeral() {
           onPress={() => navegador.push('/relatorios')}
           style={[estilos.cardAtalho, { backgroundColor: cores.superficieElevada, borderColor: cores.borda }]}>
           <Ionicons name="bar-chart-outline" size={18} color={cores.primaria} />
-          <Texto variante="rotulo" style={estilos.textoCardAtalho}>Relatórios</Texto>
+          <Texto variante="rotulo" numberOfLines={1} adjustsFontSizeToFit style={estilos.textoCardAtalho}>
+            Relatórios
+          </Texto>
         </Pressable>
 
         <Pressable
@@ -175,7 +187,9 @@ export default function TelaVisaoGeral() {
           onPress={() => navegador.push('/categorias')}
           style={[estilos.cardAtalho, { backgroundColor: cores.superficieElevada, borderColor: cores.borda }]}>
           <Ionicons name="pricetags-outline" size={18} color={cores.primaria} />
-          <Texto variante="rotulo" style={estilos.textoCardAtalho}>Metas</Texto>
+          <Texto variante="rotulo" numberOfLines={1} adjustsFontSizeToFit style={estilos.textoCardAtalho}>
+            Metas
+          </Texto>
         </Pressable>
       </View>
 
@@ -359,10 +373,12 @@ const estilos = StyleSheet.create({
   },
   linhaAtalhos: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: espacamentos.pequeno,
   },
   cardAtalho: {
     flex: 1,
+    minWidth: 96,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -382,7 +398,7 @@ const estilos = StyleSheet.create({
   },
   cartaoMetrica: {
     flex: 1,
-    padding: espacamentos.grande,
+    padding: espacamentos.medio,
     gap: espacamentos.pequeno,
   },
   iconeCaixa: {

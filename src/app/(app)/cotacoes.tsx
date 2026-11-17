@@ -140,7 +140,13 @@ export default function TelaCotacoes() {
                 <Texto variante="legenda" tom="secundaria">
                   Equivalente em Dólar
                 </Texto>
-                <Texto variante="subtitulo" tom="primaria" style={estilos.valorConversao}>
+                <Texto
+                  variante="subtitulo"
+                  tom="primaria"
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.75}
+                  style={estilos.valorConversao}>
                   US$ {saldoEmDolar.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </Texto>
                 <Texto variante="legenda" tom="secundaria">
@@ -152,7 +158,13 @@ export default function TelaCotacoes() {
                 <Texto variante="legenda" tom="secundaria">
                   Equivalente em Euro
                 </Texto>
-                <Texto variante="subtitulo" tom="primaria" style={estilos.valorConversao}>
+                <Texto
+                  variante="subtitulo"
+                  tom="primaria"
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.75}
+                  style={estilos.valorConversao}>
                   € {saldoEmEuro.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </Texto>
                 <Texto variante="legenda" tom="secundaria">
@@ -373,10 +385,12 @@ const estilos = StyleSheet.create({
   },
   gradeConversoes: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: espacamentos.medio,
   },
   itemConversao: {
     flex: 1,
+    minWidth: 130,
     padding: espacamentos.medio,
     borderRadius: raios.pequeno,
     borderWidth: 1,
