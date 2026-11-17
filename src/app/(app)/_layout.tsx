@@ -71,70 +71,70 @@ export default function LayoutApp() {
       <Tabs.Screen
         name="[id]"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Detalhes do Lançamento',
         }}
       />
       <Tabs.Screen
         name="receitas"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Receitas',
         }}
       />
       <Tabs.Screen
         name="despesas"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Despesas',
         }}
       />
       <Tabs.Screen
         name="novo-lancamento"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Novo Lançamento',
         }}
       />
       <Tabs.Screen
         name="dividas"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Dívidas',
         }}
       />
       <Tabs.Screen
         name="assistente"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Assistente',
         }}
       />
       <Tabs.Screen
         name="cotacoes"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Cotações',
         }}
       />
       <Tabs.Screen
         name="relatorios"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Relatórios',
         }}
       />
       <Tabs.Screen
         name="categorias"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Categorias & Metas',
         }}
       />
       <Tabs.Screen
         name="mais"
         options={{
-          href: null,
+          tabBarItemStyle: { display: 'none' },
           title: 'Mais',
         }}
       />

@@ -14,12 +14,12 @@ export default function Mais() {
       <CabecalhoNavegacao />
       <Texto variante="titulo" accessibilityRole="header">Mais opções</Texto>
       <Texto tom="secundaria">Explore as áreas do Meus Custos.</Texto>
-      <Botao titulo="Dívidas" variante="secundaria" onPress={() => navegador.push('/dividas')} />
-      <Botao titulo="Câmbio & Cotações (API)" variante="secundaria" onPress={() => navegador.push('/cotacoes')} />
-      <Botao titulo="Relatórios & Balanço" variante="secundaria" onPress={() => navegador.push('/relatorios')} />
-      <Botao titulo="Categorias & Orçamentos" variante="secundaria" onPress={() => navegador.push('/categorias')} />
-      <Botao titulo="Assistente" variante="secundaria" onPress={() => navegador.push('/assistente')} />
-      <Botao titulo="Perfil" variante="secundaria" onPress={() => navegador.push('/perfil')} />
+      <Botao titulo="Dívidas" variante="secundaria" onPress={() => navegador.navigate('/dividas')} />
+      <Botao titulo="Câmbio & Cotações (API)" variante="secundaria" onPress={() => navegador.navigate('/cotacoes')} />
+      <Botao titulo="Relatórios & Balanço" variante="secundaria" onPress={() => navegador.navigate('/relatorios')} />
+      <Botao titulo="Categorias & Orçamentos" variante="secundaria" onPress={() => navegador.navigate('/categorias')} />
+      <Botao titulo="Assistente" variante="secundaria" onPress={() => navegador.navigate('/assistente')} />
+      <Botao titulo="Perfil" variante="secundaria" onPress={() => navegador.navigate('/perfil')} />
       <Botao titulo="Sair da demonstração" disabled={salvando} onPress={() => executar({ tipo: 'sair-demonstracao' })} />
       <Texto variante="legenda" tom="secundaria">Seus dados de demonstração continuam salvos neste aparelho.</Texto>
     </Tela>

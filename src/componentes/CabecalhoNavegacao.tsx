@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Image, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Texto } from '@/componentes/Texto';
@@ -58,11 +58,10 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
     if (navegandoRef.current) return;
 
     navegandoRef.current = true;
-    navegador.push(caminho as any);
-
     setTimeout(() => {
+      navegador.navigate(caminho as any);
       navegandoRef.current = false;
-    }, 250);
+    }, 80);
   }
 
   async function sairDemonstracao() {
@@ -121,13 +120,6 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
         animationType="fade"
         onRequestClose={() => definirMenuAberto(false)}>
         <View style={[estilos.fundoModal, { backgroundColor: cores.fundoModal }]}>
-          {/* Toque fora para fechar */}
-          <Pressable
-            accessibilityLabel="Fechar menu"
-            onPress={() => definirMenuAberto(false)}
-            style={estilos.areaFechamento}
-          />
-
           {/* Painel lateral do menu */}
           <View
             style={[
@@ -154,43 +146,47 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
               </View>
             </View>
 
-            {/* Seção Financeiro */}
-            <Texto
-              variante="legenda"
-              style={[estilos.rotuloSecao, { color: cores.textoMutado }]}>
-              FINANCEIRO
-            </Texto>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={estilos.rolagemDrawer}>
+              {/* Seção Financeiro */}
+              <Texto
+                variante="legenda"
+                style={[estilos.rotuloSecao, { color: cores.textoMutado }]}>
+                FINANCEIRO
+              </Texto>
 
-            <View style={estilos.listaLinks}>
-              {itensMenu.map((item) => {
-                const ativo = rotaAtiva === item.id;
-                return (
-                  <Pressable
-                    key={item.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={item.rotulo}
-                    accessibilityState={{ selected: ativo }}
-                    onPress={() => navegarPara(item.caminho, item.id)}
-                    style={[
-                      estilos.itemLink,
-                      ativo && { backgroundColor: cores.itemLinkAtivo },
-                    ]}>
-                    <Ionicons
-                      name={item.icone}
-                      size={20}
-                      color={ativo ? cores.primaria : cores.textoSecundario}
-                      style={estilos.iconeLink}
-                    />
-                    <Texto
-                      variante="rotulo"
-                      tom={ativo ? 'primaria' : 'padrao'}
-                      style={ativo ? estilos.textoLinkAtivo : estilos.textoLink}>
-                      {item.rotulo}
-                    </Texto>
-                  </Pressable>
-                );
-              })}
-            </View>
+              <View style={estilos.listaLinks}>
+                {itensMenu.map((item) => {
+                  const ativo = rotaAtiva === item.id;
+                  return (
+                    <Pressable
+                      key={item.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={item.rotulo}
+                      accessibilityState={{ selected: ativo }}
+                      onPress={() => navegarPara(item.caminho, item.id)}
+                      style={[
+                        estilos.itemLink,
+                        ativo && { backgroundColor: cores.itemLinkAtivo },
+                      ]}>
+                      <Ionicons
+                        name={item.icone}
+                        size={20}
+                        color={ativo ? cores.primaria : cores.textoSecundario}
+                        style={estilos.iconeLink}
+                      />
+                      <Texto
+                        variante="rotulo"
+                        tom={ativo ? 'primaria' : 'padrao'}
+                        style={ativo ? estilos.textoLinkAtivo : estilos.textoLink}>
+                        {item.rotulo}
+                      </Texto>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </ScrollView>
 
             <View style={[estilos.divisor, { backgroundColor: cores.borda }]} />
 
@@ -259,6 +255,13 @@ export function CabecalhoNavegacao({ rotaAtiva = 'visao-geral' }: PropriedadesCa
               </Pressable>
             </View>
           </View>
+
+          {/* Toque fora para fechar */}
+          <Pressable
+            accessibilityLabel="Fechar menu"
+            onPress={() => definirMenuAberto(false)}
+            style={estilos.areaFechamento}
+          />
         </View>
       </Modal>
     </>
@@ -309,11 +312,7 @@ const estilos = StyleSheet.create({
     flexDirection: 'row',
   },
   areaFechamento: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
+    flex: 1,
   },
   painelDrawer: {
     width: '82%',
@@ -322,7 +321,9 @@ const estilos = StyleSheet.create({
     borderRightWidth: 1,
     paddingHorizontal: espacamentos.grande,
     paddingBottom: espacamentos.extraGrande,
-    zIndex: 10,
+  },
+  rolagemDrawer: {
+    flex: 1,
   },
   topoDrawer: {
     flexDirection: 'row',
