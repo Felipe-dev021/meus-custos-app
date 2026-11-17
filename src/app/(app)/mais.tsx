@@ -17,6 +17,7 @@ export default function Mais() {
       <Botao titulo="Dívidas" variante="secundaria" onPress={() => navegador.push('/dividas')} />
       <Botao titulo="Câmbio & Cotações (API)" variante="secundaria" onPress={() => navegador.push('/cotacoes')} />
       <Botao titulo="Relatórios & Balanço" variante="secundaria" onPress={() => navegador.push('/relatorios')} />
+      <Botao titulo="Categorias & Orçamentos" variante="secundaria" onPress={() => navegador.push('/categorias')} />
       <Botao titulo="Assistente" variante="secundaria" onPress={() => navegador.push('/assistente')} />
       <Botao titulo="Perfil" variante="secundaria" onPress={() => navegador.push('/perfil')} />
       <Botao titulo="Sair da demonstração" disabled={salvando} onPress={() => executar({ tipo: 'sair-demonstracao' })} />

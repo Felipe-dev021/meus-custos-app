@@ -19,6 +19,7 @@ export type RotaAtiva =
   | 'dividas'
   | 'cotacoes'
   | 'relatorios'
+  | 'categorias'
   | 'assistente'
   | 'perfil';
 
@@ -38,6 +39,7 @@ const itensMenu: {
   { id: 'dividas', rotulo: 'Dívidas', icone: 'business-outline', caminho: '/dividas' },
   { id: 'cotacoes', rotulo: 'Câmbio & Cotações', icone: 'cash-outline', caminho: '/cotacoes' },
   { id: 'relatorios', rotulo: 'Relatórios & Balanço', icone: 'bar-chart-outline', caminho: '/relatorios' },
+  { id: 'categorias', rotulo: 'Categorias & Metas', icone: 'pricetags-outline', caminho: '/categorias' },
   { id: 'assistente', rotulo: 'Assistente IA', icone: 'sparkles-outline', caminho: '/assistente' },
 ];
 

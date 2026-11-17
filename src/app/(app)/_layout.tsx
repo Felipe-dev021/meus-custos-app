@@ -125,6 +125,13 @@ export default function LayoutApp() {
         }}
       />
       <Tabs.Screen
+        name="categorias"
+        options={{
+          href: null,
+          title: 'Categorias & Metas',
+        }}
+      />
+      <Tabs.Screen
         name="mais"
         options={{
           href: null,
