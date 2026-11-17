@@ -7,6 +7,7 @@ export default function LayoutAuth() {
         headerShown: false,
       }}>
       <Stack.Screen name="login" />
+      <Stack.Screen name="registro" />
     </Stack>
   );
 }

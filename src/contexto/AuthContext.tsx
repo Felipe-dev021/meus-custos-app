@@ -16,6 +16,8 @@ export interface ContextoAutenticacao {
   isLoading: boolean;
   login: (email?: string, senha?: string) => Promise<void>;
   signIn: (email?: string, senha?: string) => Promise<void>;
+  cadastrar: (nome: string, email: string, senha?: string) => Promise<void>;
+  signUp: (nome: string, email: string, senha?: string) => Promise<void>;
   logout: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -69,6 +71,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
     await AsyncStorage.setItem(CHAVE_AUTENTICACAO, JSON.stringify(novoUsuario));
   }
 
+  async function cadastrar(nome: string, email: string, _senha?: string) {
+    const nomeLimpo = nome.trim() || 'Usuário';
+    const emailLimpo = email.trim() || 'demo@exemplo.com';
+
+    const novoUsuario: Usuario = {
+      id: 'usuario-' + Date.now(),
+      nome: nomeLimpo,
+      email: emailLimpo,
+    };
+
+    definirUsuario(novoUsuario);
+    await AsyncStorage.setItem(CHAVE_AUTENTICACAO, JSON.stringify(novoUsuario));
+  }
+
   async function logout() {
     definirUsuario(null);
     await AsyncStorage.removeItem(CHAVE_AUTENTICACAO);
@@ -85,6 +101,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     isLoading: carregando,
     login,
     signIn: login,
+    cadastrar,
+    signUp: cadastrar,
     logout,
     signOut: logout,
   };

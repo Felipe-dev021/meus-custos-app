@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Botao } from '@/componentes/Botao';
 import { CampoTexto } from '@/componentes/CampoTexto';
@@ -107,6 +107,18 @@ export default function TelaLogin() {
           onPress={aoEntrar}
           style={estilos.espacoBotao}
         />
+
+        <View style={estilos.areaCriarConta}>
+          <Texto tom="secundaria">Não tem uma conta?</Texto>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Ir para cadastro de conta"
+            onPress={() => router.push('/(auth)/registro')}>
+            <Texto tom="primaria" style={estilos.linkCriarConta}>
+              Cadastre-se
+            </Texto>
+          </Pressable>
+        </View>
       </Cartao>
 
       <View style={estilos.divisor}>
@@ -168,6 +180,16 @@ const estilos = StyleSheet.create({
   },
   espacoBotao: {
     marginTop: espacamentos.pequeno,
+  },
+  areaCriarConta: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: espacamentos.minimo,
+    marginTop: espacamentos.medio,
+  },
+  linkCriarConta: {
+    fontWeight: '700',
   },
   divisor: {
     flexDirection: 'row',
