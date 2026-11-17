@@ -14,22 +14,33 @@ import { espacamentos, raios } from '@/tema';
 import { useTema } from '@/tema/ContextoTema';
 import { formatarData, formatarMoeda } from '@/utilitarios/formatacao';
 
+type OrdenacaoReceita = 'recentes' | 'maior-valor' | 'menor-valor';
+
 export default function TelaReceitas() {
   const navegador = useRouter();
   const { receitas, resumo } = useFinanceiro();
   const { cores } = useTema();
   const [busca, definirBusca] = useState('');
+  const [ordenacao, definirOrdenacao] = useState<OrdenacaoReceita>('recentes');
 
   const receitasFiltradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
-    if (!termo) return receitas;
+    const filtradas = !termo
+      ? receitas
+      : receitas.filter((item) => {
+          const nomeCategoria = (categoriasReceita[item.categoria] ?? item.categoria).toLowerCase();
+          const descricao = item.descricao.toLowerCase();
+          return descricao.includes(termo) || nomeCategoria.includes(termo);
+        });
 
-    return receitas.filter((item) => {
-      const nomeCategoria = (categoriasReceita[item.categoria] ?? item.categoria).toLowerCase();
-      const descricao = item.descricao.toLowerCase();
-      return descricao.includes(termo) || nomeCategoria.includes(termo);
-    });
-  }, [receitas, busca]);
+    if (ordenacao === 'maior-valor') {
+      return [...filtradas].sort((a, b) => b.valorCentavos - a.valorCentavos);
+    }
+    if (ordenacao === 'menor-valor') {
+      return [...filtradas].sort((a, b) => a.valorCentavos - b.valorCentavos);
+    }
+    return filtradas;
+  }, [receitas, busca, ordenacao]);
 
   const totalExibido = useMemo(() => {
     if (!busca.trim()) return resumo.receitasRecebidas;
@@ -167,6 +178,43 @@ export default function TelaReceitas() {
           autoCapitalize="none"
           autoCorrect={false}
         />
+
+        {/* Barra de Ordenação */}
+        <View style={estilos.linhaOrdenacao}>
+          <Texto variante="legenda" tom="secundaria">Ordenar:</Texto>
+          {(
+            [
+              { id: 'recentes', rotulo: 'Mais recentes' },
+              { id: 'maior-valor', rotulo: 'Maior valor' },
+              { id: 'menor-valor', rotulo: 'Menor valor' },
+            ] as const
+          ).map((opcao) => {
+            const ativo = ordenacao === opcao.id;
+            return (
+              <Pressable
+                key={opcao.id}
+                accessibilityRole="button"
+                accessibilityState={{ selected: ativo }}
+                onPress={() => definirOrdenacao(opcao.id)}
+                style={[
+                  estilos.chipOrdenacao,
+                  {
+                    backgroundColor: ativo ? cores.superficieElevada : 'transparent',
+                    borderColor: ativo ? cores.primaria : cores.borda,
+                  },
+                ]}>
+                <Texto
+                  variante="legenda"
+                  style={{
+                    color: ativo ? cores.primaria : cores.textoSecundario,
+                    fontWeight: ativo ? '600' : '400',
+                  }}>
+                  {opcao.rotulo}
+                </Texto>
+              </Pressable>
+            );
+          })}
+        </View>
 
         {/* Cabeçalho da Lista / Tabela */}
         <View style={[estilos.cabecalhoTabela, { borderBottomColor: cores.borda }]}>
@@ -383,5 +431,17 @@ const estilos = StyleSheet.create({
   botaoLimparBusca: {
     paddingVertical: espacamentos.pequeno,
     paddingHorizontal: espacamentos.medio,
+  },
+  linhaOrdenacao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: espacamentos.pequeno,
+  },
+  chipOrdenacao: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: raios.capsula,
+    borderWidth: 1,
   },
 });
