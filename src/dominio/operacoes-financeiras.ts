@@ -1,7 +1,7 @@
 import { ehDataCivil, paraDataCivil } from '../utilitarios/formatacao.ts';
 import { categoriasDespesa, categoriasReceita } from './categorias.ts';
 import { calcularResumoFinanceiro } from './consultas-financeiras.ts';
-import type { CategoriaDespesa, CategoriaReceita, DadosFinanceiros, DataCivil, Lancamento } from './financeiro';
+import type { CategoriaDespesa, CategoriaReceita, DadosFinanceiros, DataCivil, Divida, Lancamento } from './financeiro';
 
 export type NovoLancamento = {
   descricao: string;
@@ -190,5 +190,22 @@ export function pagarParcela(
         ...itemParcela, situacao: 'paga', dataPagamento, despesaId,
       } : itemParcela),
     } : item),
+  };
+}
+
+/** Cadastra uma nova dívida ou despesa recorrente mantendo imutabilidade */
+export function cadastrarDivida(dados: DadosFinanceiros, divida: Divida): DadosFinanceiros {
+  if (!divida.id.trim()) throw new Error('Identificador da dívida inválido.');
+  if (dados.dividas.some((item) => item.id === divida.id)) {
+    throw new Error('Já existe uma dívida ou recorrência com este identificador.');
+  }
+  if (!divida.descricao.trim()) throw new Error('Informe a descrição da dívida/recorrência.');
+  if (!Array.isArray(divida.parcelas) || divida.parcelas.length === 0) {
+    throw new Error('A dívida deve possuir ao menos uma parcela.');
+  }
+
+  return {
+    ...dados,
+    dividas: [...dados.dividas, divida],
   };
 }
