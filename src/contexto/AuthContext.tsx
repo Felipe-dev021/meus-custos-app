@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
+import { apiLogin, apiRegistro } from '../servicos/apiBackend.ts';
+import { sincronizarComNuvem } from '../servicos/sincronizacao.ts';
 
 export interface Usuario {
   id: string;
@@ -56,33 +58,61 @@ export function AuthProvider({ children }: PropsWithChildren) {
     };
   }, []);
 
-  async function login(email?: string, _senha?: string) {
+  async function login(email?: string, senha?: string) {
     const emailLimpo = email?.trim() || 'demo@exemplo.com';
     const parteNome = emailLimpo.split('@')[0] || 'Usuário';
     const nomeFormatado = parteNome.charAt(0).toUpperCase() + parteNome.slice(1);
 
-    const novoUsuario: Usuario = {
+    let novoUsuario: Usuario = {
       id: 'usuario-' + Date.now(),
       nome: nomeFormatado,
       email: emailLimpo,
     };
 
+    try {
+      const resposta = await apiLogin(emailLimpo, senha);
+      if (resposta?.usuario) {
+        novoUsuario = {
+          id: resposta.usuario.id,
+          nome: resposta.usuario.nome,
+          email: resposta.usuario.email,
+        };
+      }
+    } catch {
+      // Fallback seguro para modo offline quando a API estiver indisponível
+    }
+
     definirUsuario(novoUsuario);
     await AsyncStorage.setItem(CHAVE_AUTENTICACAO, JSON.stringify(novoUsuario));
+    void sincronizarComNuvem(novoUsuario.id);
   }
 
-  async function cadastrar(nome: string, email: string, _senha?: string) {
+  async function cadastrar(nome: string, email: string, senha?: string) {
     const nomeLimpo = nome.trim() || 'Usuário';
     const emailLimpo = email.trim() || 'demo@exemplo.com';
 
-    const novoUsuario: Usuario = {
+    let novoUsuario: Usuario = {
       id: 'usuario-' + Date.now(),
       nome: nomeLimpo,
       email: emailLimpo,
     };
 
+    try {
+      const resposta = await apiRegistro(nomeLimpo, emailLimpo, senha);
+      if (resposta?.usuario) {
+        novoUsuario = {
+          id: resposta.usuario.id,
+          nome: resposta.usuario.nome,
+          email: resposta.usuario.email,
+        };
+      }
+    } catch {
+      // Fallback seguro para modo offline quando a API estiver indisponível
+    }
+
     definirUsuario(novoUsuario);
     await AsyncStorage.setItem(CHAVE_AUTENTICACAO, JSON.stringify(novoUsuario));
+    void sincronizarComNuvem(novoUsuario.id);
   }
 
   async function logout() {
