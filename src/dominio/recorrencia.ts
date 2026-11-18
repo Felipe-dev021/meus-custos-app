@@ -1,4 +1,4 @@
-import type { CategoriaDespesa, DataCivil, Divida, Parcela } from './financeiro.ts';
+import type { CategoriaDespesa, CategoriaReceita, DataCivil, Divida, Parcela, Receita } from './financeiro.ts';
 import { ehDataCivil } from '../utilitarios/formatacao.ts';
 
 export const INTERVALOS_PADRAO_DIAS = [7, 15, 21, 30] as const;
@@ -79,4 +79,66 @@ export function gerarDividaRecorrente(params: ParametrosDividaRecorrente, idCust
     categoria: params.categoria,
     parcelas,
   };
+}
+
+export interface ParametrosReceitaRecorrente {
+  descricao: string;
+  categoria: CategoriaReceita;
+  valorCentavos: number;
+  dataInicio: DataCivil;
+  quantidadeRepeticoes: number;
+  intervaloDias: number; // 7, 15, 21, 30 ou personalizado
+}
+
+/** Gera uma série de lançamentos de receitas recorrentes com datas calculadas */
+export function gerarReceitasRecorrentes(
+  params: ParametrosReceitaRecorrente,
+  idPrefixo = 'rec-recorrente',
+): Receita[] {
+  const descricao = params.descricao.trim();
+  if (!descricao || descricao.length > 100) {
+    throw new Error('A descrição da receita recorrente deve ter até 100 caracteres.');
+  }
+
+  if (!Number.isSafeInteger(params.valorCentavos) || params.valorCentavos <= 0) {
+    throw new Error('O valor de cada recebimento deve ser maior que zero em centavos.');
+  }
+
+  if (!ehDataCivil(params.dataInicio)) {
+    throw new Error('Data de início da recorrência inválida.');
+  }
+
+  if (!Number.isInteger(params.quantidadeRepeticoes) || params.quantidadeRepeticoes < 1 || params.quantidadeRepeticoes > 120) {
+    throw new Error('A quantidade de repetições deve ser entre 1 e 120.');
+  }
+
+  if (!Number.isInteger(params.intervaloDias) || params.intervaloDias < 1 || params.intervaloDias > 365) {
+    throw new Error('O intervalo entre recebimentos deve ser de 1 a 365 dias.');
+  }
+
+  const receitas: Receita[] = [];
+  let dataAtual = params.dataInicio;
+  const timestampBase = Date.now();
+
+  for (let i = 1; i <= params.quantidadeRepeticoes; i++) {
+    const id = `${idPrefixo}-${timestampBase}-${i}-${Math.random().toString(36).slice(2, 5)}`;
+    const descricaoFinal =
+      params.quantidadeRepeticoes > 1
+        ? `${descricao} (${i}/${params.quantidadeRepeticoes})`
+        : descricao;
+
+    receitas.push({
+      id,
+      tipo: 'receita',
+      descricao: descricaoFinal,
+      valorCentavos: params.valorCentavos,
+      data: dataAtual,
+      categoria: params.categoria,
+      situacao: 'recebida',
+    });
+
+    dataAtual = somarDiasDataCivil(dataAtual, params.intervaloDias);
+  }
+
+  return receitas;
 }

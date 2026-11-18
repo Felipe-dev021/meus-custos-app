@@ -209,3 +209,28 @@ export function cadastrarDivida(dados: DadosFinanceiros, divida: Divida): DadosF
     dividas: [...dados.dividas, divida],
   };
 }
+
+/** Cadastra múltiplos lançamentos de uma só vez (ex: receitas recorrentes) mantendo integridade */
+export function cadastrarLancamentosMultiplos(
+  dados: DadosFinanceiros,
+  novosLancamentos: Lancamento[],
+): DadosFinanceiros {
+  if (!Array.isArray(novosLancamentos) || novosLancamentos.length === 0) {
+    return dados;
+  }
+
+  const idsExistentes = new Set(dados.lancamentos.map((l) => l.id));
+  for (const l of novosLancamentos) {
+    if (idsExistentes.has(l.id)) {
+      throw new Error(`Identificador duplicado encontrado: ${l.id}`);
+    }
+    idsExistentes.add(l.id);
+  }
+
+  const lancamentos = [...dados.lancamentos, ...novosLancamentos];
+  calcularResumoFinanceiro(lancamentos);
+  return {
+    ...dados,
+    lancamentos,
+  };
+}
