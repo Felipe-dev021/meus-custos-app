@@ -11,7 +11,7 @@ import { Texto } from '@/componentes/Texto';
 import { categoriasDespesa, categoriasReceita } from '@/dominio/categorias';
 import type { CategoriaDespesa, CategoriaReceita } from '@/dominio/financeiro';
 import type { NovoLancamento } from '@/dominio/operacoes-financeiras';
-import { gerarDividaRecorrente, INTERVALOS_PADRAO_DIAS } from '@/dominio/recorrencia';
+import { gerarDividaRecorrente, gerarReceitasRecorrentes, INTERVALOS_PADRAO_DIAS } from '@/dominio/recorrencia';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { espacamentos, raios } from '@/tema';
 import { useTema } from '@/tema/ContextoTema';
@@ -96,6 +96,37 @@ export default function TelaNovoLancamento() {
     }
 
     try {
+      if (tipo === 'receita' && ehRecorrente) {
+        const diasIntervalo =
+          intervaloEscolhido === 'personalizado'
+            ? parseInt(intervaloCustomizadoTexto, 10)
+            : intervaloEscolhido;
+
+        if (!diasIntervalo || diasIntervalo < 1 || diasIntervalo > 365) {
+          definirErros({ geral: 'Informe um intervalo entre 1 e 365 dias.' });
+          return;
+        }
+
+        const qtd = parseInt(quantidadeRepeticoesTexto, 10);
+        if (!qtd || qtd < 1 || qtd > 120) {
+          definirErros({ geral: 'Informe uma quantidade de repetições entre 1 e 120.' });
+          return;
+        }
+
+        const receitas = gerarReceitasRecorrentes({
+          descricao: descricaoLimpa,
+          categoria: categoria as CategoriaReceita,
+          valorCentavos: valorCentavos!,
+          dataInicio: dataCivil!,
+          quantidadeRepeticoes: qtd,
+          intervaloDias: diasIntervalo,
+        });
+
+        executar({ tipo: 'cadastrar-lancamentos-multiplos', lancamentos: receitas });
+        navegador.replace('/(app)/receitas');
+        return;
+      }
+
       if (tipo === 'despesa' && ehRecorrente) {
         const diasIntervalo =
           intervaloEscolhido === 'personalizado'
@@ -410,117 +441,121 @@ export default function TelaNovoLancamento() {
           </View>
         )}
 
-        {/* Configuração de Despesa / Dívida Recorrente */}
-        {tipo === 'despesa' && (
-          <View style={estilos.secaoRecorrencia}>
-            <Pressable
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: ehRecorrente }}
-              accessibilityLabel="Ativar despesa recorrente ou parcelamento"
-              onPress={() => definirEhRecorrente((ant) => !ant)}
-              style={[
-                estilos.cardToggleRecorrencia,
-                {
-                  borderColor: ehRecorrente ? cores.primaria : cores.borda,
-                  backgroundColor: ehRecorrente ? cores.primariaSuave : cores.superficieElevada,
-                },
-              ]}>
-              <View style={estilos.linhaToggle}>
-                <Ionicons
-                  name={ehRecorrente ? 'repeat' : 'repeat-outline'}
-                  size={20}
-                  color={ehRecorrente ? cores.primaria : cores.textoSecundario}
-                />
-                <View style={{ flex: 1 }}>
-                  <Texto variante="rotulo" tom={ehRecorrente ? 'primaria' : 'padrao'}>
-                    Despesa / Dívida Recorrente
-                  </Texto>
-                  <Texto variante="legenda" tom="secundaria">
-                    Gere vencimentos para aluguel, assinaturas ou parcelamentos.
-                  </Texto>
-                </View>
-                <Ionicons
-                  name={ehRecorrente ? 'checkbox' : 'square-outline'}
-                  size={22}
-                  color={ehRecorrente ? cores.primaria : cores.textoSecundario}
-                />
+        {/* Configuração de Lançamento Recorrente (Receita ou Despesa) */}
+        <View style={estilos.secaoRecorrencia}>
+          <Pressable
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: ehRecorrente }}
+            accessibilityLabel={tipo === 'receita' ? 'Ativar receita recorrente' : 'Ativar despesa recorrente ou parcelamento'}
+            onPress={() => definirEhRecorrente((ant) => !ant)}
+            style={[
+              estilos.cardToggleRecorrencia,
+              {
+                borderColor: ehRecorrente ? cores.primaria : cores.borda,
+                backgroundColor: ehRecorrente ? cores.primariaSuave : cores.superficieElevada,
+              },
+            ]}>
+            <View style={estilos.linhaToggle}>
+              <Ionicons
+                name={ehRecorrente ? 'repeat' : 'repeat-outline'}
+                size={20}
+                color={ehRecorrente ? cores.primaria : cores.textoSecundario}
+              />
+              <View style={{ flex: 1 }}>
+                <Texto variante="rotulo" tom={ehRecorrente ? 'primaria' : 'padrao'}>
+                  {tipo === 'receita' ? 'Receita Recorrente' : 'Despesa / Dívida Recorrente'}
+                </Texto>
+                <Texto variante="legenda" tom="secundaria">
+                  {tipo === 'receita'
+                    ? 'Gere recebimentos periódicos para salário, rendimentos ou rendas extras.'
+                    : 'Gere vencimentos para aluguel, assinaturas ou parcelamentos.'}
+                </Texto>
               </View>
-            </Pressable>
+              <Ionicons
+                name={ehRecorrente ? 'checkbox' : 'square-outline'}
+                size={22}
+                color={ehRecorrente ? cores.primaria : cores.textoSecundario}
+              />
+            </View>
+          </Pressable>
 
-            {ehRecorrente && (
-              <View style={[estilos.painelRecorrencia, { borderColor: cores.borda, backgroundColor: cores.superficieElevada }]}>
-                <Texto variante="rotulo">Intervalo entre vencimentos</Texto>
-                <View style={estilos.gridIntervalos}>
-                  {INTERVALOS_PADRAO_DIAS.map((dias) => {
-                    const ativo = intervaloEscolhido === dias;
-                    const rotulo = dias === 30 ? '30 dias (Mensal)' : `${dias} dias`;
-                    return (
-                      <Pressable
-                        key={dias}
-                        accessibilityRole="button"
-                        accessibilityLabel={`Intervalo ${rotulo}`}
-                        onPress={() => {
-                          definirIntervaloEscolhido(dias);
-                          definirIntervaloCustomizadoTexto(String(dias));
-                        }}
-                        style={[
-                          estilos.chipIntervalo,
-                          {
-                            borderColor: ativo ? cores.primaria : cores.borda,
-                            backgroundColor: ativo ? cores.primariaSuave : cores.superficie,
-                          },
-                        ]}>
-                        <Texto variante="legenda" style={ativo ? { color: cores.primaria, fontWeight: '700' } : undefined}>
-                          {rotulo}
-                        </Texto>
-                      </Pressable>
-                    );
-                  })}
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Intervalo personalizado"
-                    onPress={() => definirIntervaloEscolhido('personalizado')}
-                    style={[
-                      estilos.chipIntervalo,
-                      {
-                        borderColor: intervaloEscolhido === 'personalizado' ? cores.primaria : cores.borda,
-                        backgroundColor: intervaloEscolhido === 'personalizado' ? cores.primariaSuave : cores.superficie,
-                      },
-                    ]}>
-                    <Texto variante="legenda" style={intervaloEscolhido === 'personalizado' ? { color: cores.primaria, fontWeight: '700' } : undefined}>
-                      Personalizado
-                    </Texto>
-                  </Pressable>
-                </View>
+          {ehRecorrente && (
+            <View style={[estilos.painelRecorrencia, { borderColor: cores.borda, backgroundColor: cores.superficieElevada }]}>
+              <Texto variante="rotulo">
+                {tipo === 'receita' ? 'Intervalo entre recebimentos' : 'Intervalo entre vencimentos'}
+              </Texto>
+              <View style={estilos.gridIntervalos}>
+                {INTERVALOS_PADRAO_DIAS.map((dias) => {
+                  const ativo = intervaloEscolhido === dias;
+                  const rotulo = dias === 30 ? '30 dias (Mensal)' : `${dias} dias`;
+                  return (
+                    <Pressable
+                      key={dias}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Intervalo ${rotulo}`}
+                      onPress={() => {
+                        definirIntervaloEscolhido(dias);
+                        definirIntervaloCustomizadoTexto(String(dias));
+                      }}
+                      style={[
+                        estilos.chipIntervalo,
+                        {
+                          borderColor: ativo ? cores.primaria : cores.borda,
+                          backgroundColor: ativo ? cores.primariaSuave : cores.superficie,
+                        },
+                      ]}>
+                      <Texto variante="legenda" style={ativo ? { color: cores.primaria, fontWeight: '700' } : undefined}>
+                        {rotulo}
+                      </Texto>
+                    </Pressable>
+                  );
+                })}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Intervalo personalizado"
+                  onPress={() => definirIntervaloEscolhido('personalizado')}
+                  style={[
+                    estilos.chipIntervalo,
+                    {
+                      borderColor: intervaloEscolhido === 'personalizado' ? cores.primaria : cores.borda,
+                      backgroundColor: intervaloEscolhido === 'personalizado' ? cores.primariaSuave : cores.superficie,
+                    },
+                  ]}>
+                  <Texto variante="legenda" style={intervaloEscolhido === 'personalizado' ? { color: cores.primaria, fontWeight: '700' } : undefined}>
+                    Personalizado
+                  </Texto>
+                </Pressable>
+              </View>
 
-                {intervaloEscolhido === 'personalizado' && (
-                  <CampoTexto
-                    rotulo="Intervalo personalizado (em dias)"
-                    placeholder="Ex: 10, 45, 60"
-                    value={intervaloCustomizadoTexto}
-                    onChangeText={definirIntervaloCustomizadoTexto}
-                    keyboardType="numeric"
-                  />
-                )}
-
+              {intervaloEscolhido === 'personalizado' && (
                 <CampoTexto
-                  rotulo="Quantidade de repetições / parcelas"
-                  placeholder="Ex: 12"
-                  value={quantidadeRepeticoesTexto}
-                  onChangeText={definirQuantidadeRepeticoesTexto}
+                  rotulo="Intervalo personalizado (em dias)"
+                  placeholder="Ex: 10, 45, 60"
+                  value={intervaloCustomizadoTexto}
+                  onChangeText={definirIntervaloCustomizadoTexto}
                   keyboardType="numeric"
                 />
+              )}
 
-                <View style={[estilos.boxPreviaRecorrencia, { backgroundColor: cores.primariaSuave, borderColor: cores.primaria }]}>
-                  <Ionicons name="information-circle-outline" size={18} color={cores.primaria} />
-                  <Texto variante="legenda" style={{ color: cores.primaria, flex: 1 }}>
-                    Serão geradas {parseInt(quantidadeRepeticoesTexto, 10) || 1} parcelas de {valorTexto ? `R$ ${valorTexto}` : 'R$ 0,00'} a cada {intervaloEscolhido === 'personalizado' ? (intervaloCustomizadoTexto || 'N') : intervaloEscolhido} dias no módulo de Dívidas.
-                  </Texto>
-                </View>
+              <CampoTexto
+                rotulo={tipo === 'receita' ? 'Quantidade de recebimentos (ex: 12)' : 'Quantidade de repetições / parcelas'}
+                placeholder="Ex: 12"
+                value={quantidadeRepeticoesTexto}
+                onChangeText={definirQuantidadeRepeticoesTexto}
+                keyboardType="numeric"
+              />
+
+              <View style={[estilos.boxPreviaRecorrencia, { backgroundColor: cores.primariaSuave, borderColor: cores.primaria }]}>
+                <Ionicons name="information-circle-outline" size={18} color={cores.primaria} />
+                <Texto variante="legenda" style={{ color: cores.primaria, flex: 1 }}>
+                  {tipo === 'receita'
+                    ? `Serão gerados ${parseInt(quantidadeRepeticoesTexto, 10) || 1} recebimentos de ${valorTexto ? `R$ ${valorTexto}` : 'R$ 0,00'} a cada ${intervaloEscolhido === 'personalizado' ? (intervaloCustomizadoTexto || 'N') : intervaloEscolhido} dias.`
+                    : `Serão geradas ${parseInt(quantidadeRepeticoesTexto, 10) || 1} parcelas de ${valorTexto ? `R$ ${valorTexto}` : 'R$ 0,00'} a cada ${intervaloEscolhido === 'personalizado' ? (intervaloCustomizadoTexto || 'N') : intervaloEscolhido} dias no módulo de Dívidas.`}
+                </Texto>
               </View>
-            )}
-          </View>
-        )}
+            </View>
+          )}
+        </View>
 
         {erros.geral && (
           <Texto variante="legenda" tom="perigo">
