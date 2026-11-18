@@ -1,0 +1,89 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Usuario {
+  id           String        @id @default(uuid())
+  nome         String
+  email        String        @unique
+  senhaHash    String?       @map("senha_hash")
+  criadoEm     DateTime      @default(now()) @map("criado_em")
+  atualizadoEm DateTime      @updatedAt @map("atualizado_em")
+  lancamentos  Lancamento[]
+  dividas      Divida[]
+  orcamentos   Orcamento[]
+
+  @@map("usuarios")
+}
+
+model Lancamento {
+  id              String   @id
+  usuarioId       String   @map("usuario_id")
+  descricao       String
+  valorCentavos   Int      @map("valor_centavos")
+  data            String   // formato AAAA-MM-DD
+  tipo            String   // "receita" | "despesa"
+  categoria       String
+  situacao        String   // "recebida" | "pendente" | "paga"
+  origemTipo      String?  @map("origem_tipo") // "manual" | "parcela"
+  origemDividaId  String?  @map("origem_divida_id")
+  origemParcelaId String?  @map("origem_parcela_id")
+  dataPagamento   String?  @map("data_pagamento")
+  criadoEm        DateTime @default(now()) @map("criado_em")
+  atualizadoEm    DateTime @updatedAt @map("atualizado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@map("lancamentos")
+}
+
+model Divida {
+  id           String    @id
+  usuarioId    String    @map("usuario_id")
+  descricao    String
+  categoria    String
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime  @updatedAt @map("atualizado_em")
+  parcelas     Parcela[]
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@map("dividas")
+}
+
+model Parcela {
+  id             String  @id
+  dividaId       String  @map("divida_id")
+  numero         Int
+  valorCentavos  Int     @map("valor_centavos")
+  dataVencimento String  @map("data_vencimento")
+  situacao       String  // "pendente" | "paga"
+  despesaId      String? @map("despesa_id")
+  dataPagamento  String? @map("data_pagamento")
+
+  divida Divida @relation(fields: [dividaId], references: [id], onDelete: Cascade)
+
+  @@index([dividaId])
+  @@map("parcelas")
+}
+
+model Orcamento {
+  id             String   @id @default(uuid())
+  usuarioId      String   @map("usuario_id")
+  categoria      String
+  limiteCentavos Int      @map("limite_centavos")
+  criadoEm       DateTime @default(now()) @map("criado_em")
+  atualizadoEm   DateTime @updatedAt @map("atualizado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, categoria])
+  @@map("orcamentos")
+}
