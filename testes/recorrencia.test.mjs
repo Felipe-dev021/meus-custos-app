@@ -1,10 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { cadastrarDivida } from '../src/dominio/operacoes-financeiras.ts';
+import {
+  cadastrarDivida,
+  cadastrarLancamentosMultiplos,
+} from '../src/dominio/operacoes-financeiras.ts';
 import {
   INTERVALOS_PADRAO_DIAS,
   gerarDividaRecorrente,
+  gerarReceitasRecorrentes,
   somarDiasDataCivil,
 } from '../src/dominio/recorrencia.ts';
 
@@ -128,4 +132,141 @@ test('cadastrarDivida adiciona nova divida preservando imutabilidade do estado',
   assert.equal(atualizado.dividas.length, 1);
   assert.equal(atualizado.dividas[0].descricao, 'Internet Fibra');
   assert.equal(estadoInicial.dividas.length, 0); // imutabilidade preservada
+});
+
+test('gera receitas recorrentes de salario mensal a cada 30 dias com numeracao sequencial', () => {
+  const receitas = gerarReceitasRecorrentes({
+    descricao: 'Salário Mensal',
+    categoria: 'salario',
+    valorCentavos: 500000,
+    dataInicio: '2026-01-05',
+    quantidadeRepeticoes: 3,
+    intervaloDias: 30,
+  });
+
+  assert.equal(receitas.length, 3);
+
+  // Ocorrência 1
+  assert.equal(receitas[0].descricao, 'Salário Mensal (1/3)');
+  assert.equal(receitas[0].categoria, 'salario');
+  assert.equal(receitas[0].valorCentavos, 500000);
+  assert.equal(receitas[0].data, '2026-01-05');
+  assert.equal(receitas[0].tipo, 'receita');
+  assert.equal(receitas[0].situacao, 'recebida');
+  assert.ok(receitas[0].id);
+
+  // Ocorrência 2 (+30 dias)
+  assert.equal(receitas[1].descricao, 'Salário Mensal (2/3)');
+  assert.equal(receitas[1].data, '2026-02-04');
+
+  // Ocorrência 3 (+30 dias)
+  assert.equal(receitas[2].descricao, 'Salário Mensal (3/3)');
+  assert.equal(receitas[2].data, '2026-03-06');
+});
+
+test('gera receitas recorrentes com intervalo quinzenal de 15 dias', () => {
+  const receitas = gerarReceitasRecorrentes({
+    descricao: 'Adiantamento Freelance',
+    categoria: 'outros',
+    valorCentavos: 120000,
+    dataInicio: '2026-04-01',
+    quantidadeRepeticoes: 2,
+    intervaloDias: 15,
+  });
+
+  assert.equal(receitas.length, 2);
+  assert.equal(receitas[0].descricao, 'Adiantamento Freelance (1/2)');
+  assert.equal(receitas[0].data, '2026-04-01');
+  assert.equal(receitas[1].descricao, 'Adiantamento Freelance (2/2)');
+  assert.equal(receitas[1].data, '2026-04-16');
+});
+
+test('rejeita parametros inconsistentes para geracao de receitas recorrentes', () => {
+  assert.throws(
+    () =>
+      gerarReceitasRecorrentes({
+        descricao: '',
+        categoria: 'salario',
+        valorCentavos: 1000,
+        dataInicio: '2026-01-01',
+        quantidadeRepeticoes: 3,
+        intervaloDias: 30,
+      }),
+    /descrição/,
+  );
+
+  assert.throws(
+    () =>
+      gerarReceitasRecorrentes({
+        descricao: 'Salário',
+        categoria: 'salario',
+        valorCentavos: 0,
+        dataInicio: '2026-01-01',
+        quantidadeRepeticoes: 3,
+        intervaloDias: 30,
+      }),
+    /valor/,
+  );
+
+  assert.throws(
+    () =>
+      gerarReceitasRecorrentes({
+        descricao: 'Salário',
+        categoria: 'salario',
+        valorCentavos: 5000,
+        dataInicio: '2026-01-01',
+        quantidadeRepeticoes: 0,
+        intervaloDias: 30,
+      }),
+    /quantidade de repetições/,
+  );
+
+  assert.throws(
+    () =>
+      gerarReceitasRecorrentes({
+        descricao: 'Salário',
+        categoria: 'salario',
+        valorCentavos: 5000,
+        dataInicio: '2026-01-01',
+        quantidadeRepeticoes: 3,
+        intervaloDias: 0,
+      }),
+    /intervalo entre recebimentos/,
+  );
+});
+
+test('cadastrarLancamentosMultiplos cadastra multiplas receitas recorrentes preservando imutabilidade', () => {
+  const dadosIniciais = {
+    lancamentos: [
+      {
+        id: 'lanc-1',
+        descricao: 'Saldo Inicial',
+        categoria: 'outros',
+        valorCentavos: 10000,
+        data: '2026-01-01',
+        tipo: 'receita',
+        situacao: 'recebida',
+      },
+    ],
+    dividas: [],
+  };
+
+  const novasReceitas = gerarReceitasRecorrentes({
+    descricao: 'Consultoria Mensal',
+    categoria: 'servicos',
+    valorCentavos: 250000,
+    dataInicio: '2026-02-01',
+    quantidadeRepeticoes: 2,
+    intervaloDias: 30,
+  });
+
+  const atualizado = cadastrarLancamentosMultiplos(dadosIniciais, novasReceitas);
+
+  assert.equal(atualizado.lancamentos.length, 3);
+  assert.equal(atualizado.lancamentos[1].descricao, 'Consultoria Mensal (1/2)');
+  assert.equal(atualizado.lancamentos[2].descricao, 'Consultoria Mensal (2/2)');
+  assert.ok(atualizado.lancamentos[1].id);
+  assert.ok(atualizado.lancamentos[2].id);
+  // Imutabilidade
+  assert.equal(dadosIniciais.lancamentos.length, 1);
 });
