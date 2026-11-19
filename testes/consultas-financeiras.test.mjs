@@ -170,3 +170,55 @@ test('calcularTotalPrevistoMes soma corretamente apenas receitas ou despesas do 
   const totalReceitasDez = calcularTotalPrevistoMes(lancamentos, 'receita', '2026-12');
   assert.equal(totalReceitasDez, 0);
 });
+
+test('filtra e totaliza despesas pagas e pendentes de forma independente no mes atual', () => {
+  const lancamentos = [
+    {
+      id: 'd1',
+      descricao: 'Despesa Outubro',
+      tipo: 'despesa',
+      categoria: 'alimentacao',
+      situacao: 'paga',
+      valorCentavos: 5000,
+      data: '2026-10-31',
+      dataPagamento: '2026-10-31',
+      origem: { tipo: 'manual' },
+    },
+    {
+      id: 'd2',
+      descricao: 'Aluguel Novembro',
+      tipo: 'despesa',
+      categoria: 'moradia',
+      situacao: 'pendente',
+      valorCentavos: 180000,
+      data: '2026-11-10',
+      origem: { tipo: 'manual' },
+    },
+    {
+      id: 'd3',
+      descricao: 'Supermercado Novembro',
+      tipo: 'despesa',
+      categoria: 'alimentacao',
+      situacao: 'paga',
+      valorCentavos: 45000,
+      data: '2026-11-05',
+      dataPagamento: '2026-11-05',
+      origem: { tipo: 'manual' },
+    },
+  ];
+
+  const doMes = filtrarLancamentosPorMes(lancamentos, '2026-11');
+  assert.equal(doMes.length, 2);
+
+  const pagasMes = doMes.filter((item) => item.situacao === 'paga');
+  const pendentesMes = doMes.filter((item) => item.situacao === 'pendente');
+
+  assert.equal(pagasMes.length, 1);
+  assert.equal(pagasMes[0].valorCentavos, 45000);
+
+  assert.equal(pendentesMes.length, 1);
+  assert.equal(pendentesMes[0].valorCentavos, 180000);
+
+  const totalMes = doMes.reduce((acc, item) => acc + item.valorCentavos, 0);
+  assert.equal(totalMes, 225000);
+});
