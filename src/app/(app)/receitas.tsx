@@ -23,30 +23,19 @@ export default function TelaReceitas() {
   const { cores } = useTema();
   const [busca, definirBusca] = useState('');
   const [ordenacao, definirOrdenacao] = useState<OrdenacaoReceita>('recentes');
-  const [apenasMesAtual, definirApenasMesAtual] = useState(false);
 
   const mesAtual = useMemo(() => paraDataCivil(new Date()).slice(0, 7), []);
-
-  const contagemMesAtual = useMemo(
-    () => receitas.filter((item) => item.data.slice(0, 7) === mesAtual).length,
-    [receitas, mesAtual],
-  );
 
   const totalMesAtual = useMemo(
     () => calcularTotalPrevistoMes(receitas, 'receita', mesAtual),
     [receitas, mesAtual],
   );
 
-  const receitasBase = useMemo(() => {
-    if (!apenasMesAtual) return receitas;
-    return filtrarLancamentosPorMes(receitas, mesAtual);
-  }, [receitas, apenasMesAtual, mesAtual]);
-
   const receitasFiltradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     const filtradas = !termo
-      ? receitasBase
-      : receitasBase.filter((item) => {
+      ? receitas
+      : receitas.filter((item) => {
           const nomeCategoria = (categoriasReceita[item.categoria] ?? item.categoria).toLowerCase();
           const descricao = item.descricao.toLowerCase();
           return descricao.includes(termo) || nomeCategoria.includes(termo);
@@ -59,13 +48,12 @@ export default function TelaReceitas() {
       return [...filtradas].sort((a, b) => a.valorCentavos - b.valorCentavos);
     }
     return filtradas;
-  }, [receitasBase, busca, ordenacao]);
+  }, [receitas, busca, ordenacao]);
 
   const totalExibido = useMemo(() => {
-    if (!busca.trim() && !apenasMesAtual) return resumo.receitasRecebidas;
-    if (!busca.trim() && apenasMesAtual) return totalMesAtual;
+    if (!busca.trim()) return resumo.receitasRecebidas;
     return receitasFiltradas.reduce((total, item) => total + item.valorCentavos, 0);
-  }, [busca, apenasMesAtual, resumo.receitasRecebidas, totalMesAtual, receitasFiltradas]);
+  }, [busca, receitasFiltradas, resumo.receitasRecebidas]);
 
   const mediaPorLancamento = useMemo(() => {
     if (receitasFiltradas.length === 0) return 0;
@@ -104,7 +92,7 @@ export default function TelaReceitas() {
       {/* Grade de Cartões de Métricas */}
       <View style={estilos.gradeMetricas}>
         <View style={estilos.linhaMetricas}>
-          {/* Card 1: Total de entradas ou Previsto no mês */}
+          {/* Card 1: Total de entradas */}
           <Cartao
             style={[
               estilos.cartaoMetrica,
@@ -114,14 +102,10 @@ export default function TelaReceitas() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Ionicons
-                name={apenasMesAtual ? 'calendar-outline' : 'cash-outline'}
-                size={18}
-                color={cores.primaria}
-              />
+              <Ionicons name="cash-outline" size={18} color={cores.primaria} />
             </View>
             <Texto variante="legenda" tom="secundaria">
-              {apenasMesAtual ? 'Previsto esse mês' : 'Total de entradas'}
+              Total de entradas
             </Texto>
             <Texto
               variante="subtitulo"
@@ -144,7 +128,7 @@ export default function TelaReceitas() {
               <Ionicons name="trending-up-outline" size={18} color={cores.texto} />
             </View>
             <Texto variante="legenda" tom="secundaria">
-              {apenasMesAtual ? 'Receitas no mês' : 'Receitas registradas'}
+              Receitas registradas
             </Texto>
             <Texto
               variante="subtitulo"
@@ -155,26 +139,49 @@ export default function TelaReceitas() {
           </Cartao>
         </View>
 
-        {/* Card 3: Média por lançamento */}
-        <Cartao
-          style={[
-            estilos.cartaoMetricaUnico,
-            {
-              backgroundColor: cores.cartaoMetrica,
-              borderColor: cores.borda,
-            },
-          ]}>
-          <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-            <Ionicons name="calculator-outline" size={18} color={cores.texto} />
-          </View>
-          <Texto variante="legenda" tom="secundaria">Média por lançamento</Texto>
-          <Texto
-            variante="subtitulo"
-            numberOfLines={1}
-            style={[estilos.valorMetrica, { color: cores.texto }]}>
-            {formatarMoeda(mediaPorLancamento)}
-          </Texto>
-        </Cartao>
+        <View style={estilos.linhaMetricas}>
+          {/* Card 3: Média por lançamento */}
+          <Cartao
+            style={[
+              estilos.cartaoMetrica,
+              {
+                backgroundColor: cores.cartaoMetrica,
+                borderColor: cores.borda,
+              },
+            ]}>
+            <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+              <Ionicons name="calculator-outline" size={18} color={cores.texto} />
+            </View>
+            <Texto variante="legenda" tom="secundaria">Média por lançamento</Texto>
+            <Texto
+              variante="subtitulo"
+              numberOfLines={1}
+              style={[estilos.valorMetrica, { color: cores.texto }]}>
+              {formatarMoeda(mediaPorLancamento)}
+            </Texto>
+          </Cartao>
+
+          {/* Card 4: Previsto esse mês */}
+          <Cartao
+            style={[
+              estilos.cartaoMetrica,
+              {
+                backgroundColor: cores.cartaoMetrica,
+                borderColor: cores.borda,
+              },
+            ]}>
+            <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
+              <Ionicons name="calendar-outline" size={18} color={cores.primaria} />
+            </View>
+            <Texto variante="legenda" tom="secundaria">Previsto esse mês</Texto>
+            <Texto
+              variante="subtitulo"
+              numberOfLines={1}
+              style={[estilos.valorMetrica, { color: cores.texto }]}>
+              {formatarMoeda(totalMesAtual)}
+            </Texto>
+          </Cartao>
+        </View>
       </View>
 
       {/* Painel com Tabela/Lista de Entradas */}
@@ -192,86 +199,10 @@ export default function TelaReceitas() {
               Entradas registradas
             </Texto>
             <Texto variante="legenda" tom="secundaria">
-              {apenasMesAtual
-                ? `Previsto para este mês: ${formatarMoeda(totalMesAtual)}`
-                : 'Ordenadas por data de recebimento'}
+              Ordenadas por data de recebimento
             </Texto>
           </View>
         </View>
-
-        {/* Filtro de Período: Todas vs Previsto esse mês */}
-        <View style={estilos.linhaFiltros}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Exibir todas as receitas (${receitas.length})`}
-            accessibilityState={{ selected: !apenasMesAtual }}
-            onPress={() => definirApenasMesAtual(false)}
-            style={[
-              estilos.botaoFiltro,
-              {
-                backgroundColor: !apenasMesAtual ? cores.primaria : cores.superficieElevada,
-                borderColor: !apenasMesAtual ? cores.primaria : cores.borda,
-              },
-            ]}>
-            <Texto
-              variante="rotulo"
-              style={[
-                estilos.textoFiltro,
-                { color: !apenasMesAtual ? cores.sobrePrimaria : cores.texto },
-              ]}>
-              {`Todas (${receitas.length})`}
-            </Texto>
-          </Pressable>
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Exibir apenas receitas previstas para esse mês (${contagemMesAtual})`}
-            accessibilityState={{ selected: apenasMesAtual }}
-            onPress={() => definirApenasMesAtual((prev) => !prev)}
-            style={[
-              estilos.botaoFiltro,
-              {
-                backgroundColor: apenasMesAtual ? cores.primaria : cores.superficieElevada,
-                borderColor: apenasMesAtual ? cores.primaria : cores.borda,
-              },
-            ]}>
-            <View style={estilos.conteudoBotaoPrevisto}>
-              <Ionicons
-                name="calendar-outline"
-                size={15}
-                color={apenasMesAtual ? cores.sobrePrimaria : cores.primaria}
-                style={{ marginRight: 5 }}
-              />
-              <Texto
-                variante="rotulo"
-                style={[
-                  estilos.textoFiltro,
-                  { color: apenasMesAtual ? cores.sobrePrimaria : cores.texto },
-                ]}>
-                {`Previsto esse mês (${contagemMesAtual})`}
-              </Texto>
-            </View>
-          </Pressable>
-        </View>
-
-        {/* Aviso de filtro ativo quando 'Previsto esse mês' estiver habilitado */}
-        {apenasMesAtual ? (
-          <View
-            style={[
-              estilos.avisoFiltroAtivo,
-              { backgroundColor: cores.superficieElevada, borderColor: cores.borda },
-            ]}>
-            <Ionicons name="information-circle-outline" size={16} color={cores.primaria} />
-            <Texto variante="legenda" tom="secundaria" style={{ flex: 1, marginLeft: 6 }}>
-              {`Contando apenas receitas previstas para o mês atual (${formatarMoeda(totalMesAtual)})`}
-            </Texto>
-            <Pressable onPress={() => definirApenasMesAtual(false)} hitSlop={8}>
-              <Texto variante="legenda" tom="primaria" style={{ fontWeight: '600' }}>
-                Ver todas
-              </Texto>
-            </Pressable>
-          </View>
-        ) : null}
 
         {/* Campo de Busca integrado */}
         <CampoTexto
