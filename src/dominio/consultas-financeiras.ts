@@ -71,6 +71,25 @@ export function listarDespesas(lancamentos: readonly Lancamento[]): Despesa[] {
     .sort((primeiro, segundo) => segundo.data.localeCompare(primeiro.data));
 }
 
+/** Filtra lançamentos pertencentes a um determinado mês (formato "YYYY-MM"). */
+export function filtrarLancamentosPorMes<T extends Lancamento>(
+  lancamentos: readonly T[],
+  anoMes: string,
+): T[] {
+  return lancamentos.filter((item) => item.data.startsWith(anoMes));
+}
+
+/** Calcula o total previsto de receitas ou despesas para um determinado mês civil. */
+export function calcularTotalPrevistoMes(
+  lancamentos: readonly Lancamento[],
+  tipo: 'receita' | 'despesa',
+  anoMes: string,
+): Centavos {
+  return lancamentos
+    .filter((item) => item.tipo === tipo && item.data.startsWith(anoMes))
+    .reduce((total, item) => total + item.valorCentavos, 0);
+}
+
 /** Agrupa somente despesas pagas, do maior gasto para o menor. */
 export function calcularGastosPorCategoria(lancamentos: readonly Lancamento[]): GastoPorCategoria[] {
   const totais = new Map<CategoriaDespesa, Centavos>();

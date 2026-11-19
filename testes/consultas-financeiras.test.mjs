@@ -5,6 +5,8 @@ import { criarDadosDemonstracao } from '../src/dados/demonstracao.ts';
 import {
   calcularGastosPorCategoria,
   calcularResumoFinanceiro,
+  calcularTotalPrevistoMes,
+  filtrarLancamentosPorMes,
   listarReceitas,
   listarUltimosLancamentos,
 } from '../src/dominio/consultas-financeiras.ts';
@@ -108,4 +110,63 @@ test('rejeita valores inválidos e operações que perderiam precisão', () => {
   for (const limite of [-1, 1.5, NaN, Infinity]) {
     assert.throws(() => listarUltimosLancamentos([], limite), RangeError);
   }
+});
+
+test('filtrarLancamentosPorMes retorna somente os lancamentos do mes especificado', () => {
+  const lancamentos = [
+    receita('r1', 100000, '2026-11-05'),
+    receita('r2', 200000, '2026-11-20'),
+    receita('r3', 150000, '2026-10-15'),
+    despesa('d1', 50000, 'paga'), // 2026-09-02
+  ];
+
+  const resultadoNov = filtrarLancamentosPorMes(lancamentos, '2026-11');
+  assert.equal(resultadoNov.length, 2);
+  assert.deepEqual(resultadoNov.map((l) => l.id), ['r1', 'r2']);
+
+  const resultadoOut = filtrarLancamentosPorMes(lancamentos, '2026-10');
+  assert.equal(resultadoOut.length, 1);
+  assert.equal(resultadoOut[0].id, 'r3');
+
+  const resultadoVazio = filtrarLancamentosPorMes(lancamentos, '2026-12');
+  assert.deepEqual(resultadoVazio, []);
+});
+
+test('calcularTotalPrevistoMes soma corretamente apenas receitas ou despesas do mes especificado', () => {
+  const lancamentos = [
+    receita('r1', 250000, '2026-11-01'),
+    receita('r2', 300000, '2026-11-15'),
+    receita('r3', 100000, '2026-10-01'), // outro mês
+    despesa('d1', 80000, 'paga'), // 2026-09-02
+    {
+      id: 'd2',
+      descricao: 'Aluguel Nov',
+      tipo: 'despesa',
+      categoria: 'moradia',
+      situacao: 'pendente',
+      valorCentavos: 120000,
+      data: '2026-11-10',
+      origem: { tipo: 'manual' },
+    },
+    {
+      id: 'd3',
+      descricao: 'Luz Nov',
+      tipo: 'despesa',
+      categoria: 'moradia',
+      situacao: 'paga',
+      valorCentavos: 25000,
+      data: '2026-11-12',
+      dataPagamento: '2026-11-12',
+      origem: { tipo: 'manual' },
+    },
+  ];
+
+  const totalReceitasNov = calcularTotalPrevistoMes(lancamentos, 'receita', '2026-11');
+  assert.equal(totalReceitasNov, 550000); // 250000 + 300000
+
+  const totalDespesasNov = calcularTotalPrevistoMes(lancamentos, 'despesa', '2026-11');
+  assert.equal(totalDespesasNov, 145000); // 120000 + 25000
+
+  const totalReceitasDez = calcularTotalPrevistoMes(lancamentos, 'receita', '2026-12');
+  assert.equal(totalReceitasDez, 0);
 });
