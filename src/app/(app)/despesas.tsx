@@ -9,6 +9,7 @@ import { Cartao } from '@/componentes/Cartao';
 import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
 import { categoriasDespesa } from '@/dominio/categorias';
+import { calcularTotalPrevistoMes, filtrarLancamentosPorMes } from '@/dominio/consultas-financeiras';
 import type { Despesa } from '@/dominio/financeiro';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { espacamentos, raios } from '@/tema';
@@ -26,20 +27,54 @@ export default function TelaDespesas() {
   const [busca, definirBusca] = useState('');
   const [filtro, definirFiltro] = useState<FiltroSituacao>('todas');
   const [ordenacao, definirOrdenacao] = useState<OrdenacaoDespesa>('recentes');
+  const [apenasMesAtual, definirApenasMesAtual] = useState(false);
+
+  const mesAtual = useMemo(() => paraDataCivil(new Date()).slice(0, 7), []);
+
+  const contagemMesAtual = useMemo(
+    () => despesas.filter((item) => item.data.slice(0, 7) === mesAtual).length,
+    [despesas, mesAtual],
+  );
+
+  const totalDespesasMes = useMemo(
+    () => calcularTotalPrevistoMes(despesas, 'despesa', mesAtual),
+    [despesas, mesAtual],
+  );
+
+  const despesasBase = useMemo(() => {
+    if (!apenasMesAtual) return despesas;
+    return filtrarLancamentosPorMes(despesas, mesAtual);
+  }, [despesas, apenasMesAtual, mesAtual]);
 
   const contagemPagas = useMemo(
-    () => despesas.filter((item) => item.situacao === 'paga').length,
-    [despesas],
+    () => despesasBase.filter((item) => item.situacao === 'paga').length,
+    [despesasBase],
   );
   const contagemPendentes = useMemo(
-    () => despesas.filter((item) => item.situacao === 'pendente').length,
-    [despesas],
+    () => despesasBase.filter((item) => item.situacao === 'pendente').length,
+    [despesasBase],
+  );
+
+  const totalPagasBase = useMemo(
+    () =>
+      despesasBase
+        .filter((item) => item.situacao === 'paga')
+        .reduce((tot, item) => tot + item.valorCentavos, 0),
+    [despesasBase],
+  );
+
+  const totalPendentesBase = useMemo(
+    () =>
+      despesasBase
+        .filter((item) => item.situacao === 'pendente')
+        .reduce((tot, item) => tot + item.valorCentavos, 0),
+    [despesasBase],
   );
 
   const despesasFiltradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
 
-    const filtradas = despesas.filter((item) => {
+    const filtradas = despesasBase.filter((item) => {
       // Filtro de situação
       if (filtro === 'pagas' && item.situacao !== 'paga') return false;
       if (filtro === 'pendentes' && item.situacao !== 'pendente') return false;
@@ -58,7 +93,7 @@ export default function TelaDespesas() {
       return [...filtradas].sort((a, b) => a.valorCentavos - b.valorCentavos);
     }
     return filtradas;
-  }, [despesas, busca, filtro, ordenacao]);
+  }, [despesasBase, busca, filtro, ordenacao]);
 
   const totalExibido = useMemo(() => {
     return despesasFiltradas.reduce((total, item) => total + item.valorCentavos, 0);
@@ -131,7 +166,7 @@ export default function TelaDespesas() {
       {/* Grade de Métricas */}
       <View style={estilos.gradeMetricas}>
         <View style={estilos.linhaMetricas}>
-          {/* Card 1: Total de Despesas */}
+          {/* Card 1: Total de Despesas ou Previsto no mês */}
           <Cartao
             style={[
               estilos.cartaoMetrica,
@@ -141,14 +176,24 @@ export default function TelaDespesas() {
               },
             ]}>
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
-              <Ionicons name="card-outline" size={18} color={cores.texto} />
+              <Ionicons
+                name={apenasMesAtual ? 'calendar-outline' : 'card-outline'}
+                size={18}
+                color={cores.texto}
+              />
             </View>
-            <Texto variante="legenda" tom="secundaria">Total de despesas</Texto>
+            <Texto variante="legenda" tom="secundaria">
+              {apenasMesAtual ? 'Previsto esse mês' : 'Total de despesas'}
+            </Texto>
             <Texto
               variante="subtitulo"
               numberOfLines={1}
               style={[estilos.valorMetrica, { color: cores.texto }]}>
-              {formatarMoeda(resumo.despesasPagas + resumo.despesasPendentes)}
+              {formatarMoeda(
+                apenasMesAtual
+                  ? totalDespesasMes
+                  : resumo.despesasPagas + resumo.despesasPendentes,
+              )}
             </Texto>
           </Cartao>
 
@@ -164,12 +209,14 @@ export default function TelaDespesas() {
             <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
               <Ionicons name="checkmark-circle-outline" size={18} color={cores.primaria} />
             </View>
-            <Texto variante="legenda" tom="secundaria">Despesas pagas</Texto>
+            <Texto variante="legenda" tom="secundaria">
+              {apenasMesAtual ? 'Pagas no mês' : 'Despesas pagas'}
+            </Texto>
             <Texto
               variante="subtitulo"
               numberOfLines={1}
               style={[estilos.valorMetrica, { color: cores.texto }]}>
-              {formatarMoeda(resumo.despesasPagas)}
+              {formatarMoeda(apenasMesAtual ? totalPagasBase : resumo.despesasPagas)}
             </Texto>
           </Cartao>
         </View>
@@ -186,13 +233,19 @@ export default function TelaDespesas() {
           <View style={[estilos.iconeCaixa, { backgroundColor: cores.iconeCaixa }]}>
             <Ionicons name="time-outline" size={18} color={cores.aviso} />
           </View>
-          <Texto variante="legenda" tom="secundaria">Despesas pendentes</Texto>
+          <Texto variante="legenda" tom="secundaria">
+            {apenasMesAtual ? 'Pendentes no mês' : 'Despesas pendentes'}
+          </Texto>
           <Texto
             variante="subtitulo"
-            tom={resumo.despesasPendentes > 0 ? 'perigo' : 'padrao'}
+            tom={
+              (apenasMesAtual ? totalPendentesBase : resumo.despesasPendentes) > 0
+                ? 'perigo'
+                : 'padrao'
+            }
             numberOfLines={1}
             style={estilos.valorMetrica}>
-            {formatarMoeda(resumo.despesasPendentes)}
+            {formatarMoeda(apenasMesAtual ? totalPendentesBase : resumo.despesasPendentes)}
           </Texto>
         </Cartao>
       </View>
@@ -212,12 +265,88 @@ export default function TelaDespesas() {
               Saídas registradas
             </Texto>
             <Texto variante="legenda" tom="secundaria">
-              {busca || filtro !== 'todas'
-                ? `Total do filtro: ${formatarMoeda(totalExibido)}`
-                : 'Toque na situação para alternar entre paga e pendente'}
+              {apenasMesAtual
+                ? `Previsto para este mês: ${formatarMoeda(totalDespesasMes)}`
+                : busca || filtro !== 'todas'
+                  ? `Total do filtro: ${formatarMoeda(totalExibido)}`
+                  : 'Toque na situação para alternar entre paga e pendente'}
             </Texto>
           </View>
         </View>
+
+        {/* Filtro de Período: Todo o período vs Previsto esse mês */}
+        <View style={estilos.linhaPeriodo}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Exibir despesas de todo o período (${despesas.length})`}
+            accessibilityState={{ selected: !apenasMesAtual }}
+            onPress={() => definirApenasMesAtual(false)}
+            style={[
+              estilos.botaoPeriodo,
+              {
+                backgroundColor: !apenasMesAtual ? cores.primaria : cores.superficieElevada,
+                borderColor: !apenasMesAtual ? cores.primaria : cores.borda,
+              },
+            ]}>
+            <Texto
+              variante="rotulo"
+              style={[
+                estilos.textoFiltro,
+                { color: !apenasMesAtual ? cores.sobrePrimaria : cores.texto },
+              ]}>
+              {`Todo o período (${despesas.length})`}
+            </Texto>
+          </Pressable>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Exibir apenas despesas previstas para esse mês (${contagemMesAtual})`}
+            accessibilityState={{ selected: apenasMesAtual }}
+            onPress={() => definirApenasMesAtual((prev) => !prev)}
+            style={[
+              estilos.botaoPeriodo,
+              {
+                backgroundColor: apenasMesAtual ? cores.primaria : cores.superficieElevada,
+                borderColor: apenasMesAtual ? cores.primaria : cores.borda,
+              },
+            ]}>
+            <View style={estilos.conteudoBotaoPrevisto}>
+              <Ionicons
+                name="calendar-outline"
+                size={15}
+                color={apenasMesAtual ? cores.sobrePrimaria : cores.primaria}
+                style={{ marginRight: 5 }}
+              />
+              <Texto
+                variante="rotulo"
+                style={[
+                  estilos.textoFiltro,
+                  { color: apenasMesAtual ? cores.sobrePrimaria : cores.texto },
+                ]}>
+                {`Previsto esse mês (${contagemMesAtual})`}
+              </Texto>
+            </View>
+          </Pressable>
+        </View>
+
+        {/* Aviso de filtro ativo quando 'Previsto esse mês' estiver habilitado */}
+        {apenasMesAtual ? (
+          <View
+            style={[
+              estilos.avisoFiltroAtivo,
+              { backgroundColor: cores.superficieElevada, borderColor: cores.borda },
+            ]}>
+            <Ionicons name="information-circle-outline" size={16} color={cores.primaria} />
+            <Texto variante="legenda" tom="secundaria" style={{ flex: 1, marginLeft: 6 }}>
+              {`Contando apenas despesas previstas para o mês atual (${formatarMoeda(totalDespesasMes)})`}
+            </Texto>
+            <Pressable onPress={() => definirApenasMesAtual(false)} hitSlop={8}>
+              <Texto variante="legenda" tom="primaria" style={{ fontWeight: '600' }}>
+                Ver todas
+              </Texto>
+            </Pressable>
+          </View>
+        ) : null}
 
         {/* Campo de Busca */}
         <CampoTexto
@@ -233,7 +362,7 @@ export default function TelaDespesas() {
         <View style={estilos.linhaFiltros}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Filtrar por todas as despesas. Total: ${despesas.length}`}
+            accessibilityLabel={`Filtrar por todas as despesas. Total: ${despesasBase.length}`}
             accessibilityState={{ selected: filtro === 'todas' }}
             onPress={() => definirFiltro('todas')}
             style={[
@@ -249,7 +378,7 @@ export default function TelaDespesas() {
                 estilos.textoFiltro,
                 { color: filtro === 'todas' ? cores.sobrePrimaria : cores.texto },
               ]}>
-              {`Todas (${despesas.length})`}
+              {`Todas (${despesasBase.length})`}
             </Texto>
           </Pressable>
 
@@ -654,5 +783,32 @@ const estilos = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: raios.capsula,
     borderWidth: 1,
+  },
+  linhaPeriodo: {
+    flexDirection: 'row',
+    gap: espacamentos.pequeno,
+    marginBottom: espacamentos.pequeno,
+  },
+  botaoPeriodo: {
+    flex: 1,
+    paddingVertical: espacamentos.pequeno,
+    paddingHorizontal: espacamentos.pequeno,
+    borderRadius: raios.medio,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  conteudoBotaoPrevisto: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avisoFiltroAtivo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: espacamentos.pequeno,
+    borderRadius: raios.medio,
+    borderWidth: 1,
+    marginBottom: espacamentos.pequeno,
   },
 });
