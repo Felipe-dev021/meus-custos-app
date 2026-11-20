@@ -112,4 +112,4 @@ Para visualizar:
 ---
 
 ## 🎥 Vídeo Demonstrativo (Até 5 minutos)
-- **Link do vídeo**: *(A ser adicionado pelo Lucas após a gravação demonstrando o app e o backend)*
+- **Link do vídeo**: *https://drive.google.com/file/d/1i0fcoYaNQ6udmLcvbqRkCnRTvbX5OjFa/view?usp=sharing*
