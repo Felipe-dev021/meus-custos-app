@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarDadosDemonstracao } from '../src/dados/demonstracao.ts';
-import { restaurarDados, serializarDados } from '../src/dados/persistencia.ts';
+import { criarDadosDemonstracao, criarDadosVazios } from '../src/dados/demonstracao.ts';
+import { obterChaveDadosUsuario, restaurarDados, serializarDados } from '../src/dados/persistencia.ts';
+import { obterChaveOrcamentosUsuario } from '../src/dominio/orcamentos.ts';
 import { criarEstadoFinanceiro } from '../src/estado/estado-financeiro.ts';
 
 const dadosIniciais = () => criarDadosDemonstracao(new Date(2026, 8, 21));
@@ -161,4 +162,29 @@ test('inicializações concorrentes fazem apenas uma leitura', async () => {
   await Promise.all([primeira, segunda]);
   assert.equal(leituras, 1);
   assert.equal(memoria.gravacoes, 0);
+});
+
+test('criarDadosVazios gera estrutura financeira limpa sem lancamentos para novas contas', () => {
+  const dados = criarDadosVazios({ nome: 'Lucas Marins', email: 'lucas@exemplo.com' });
+  assert.equal(dados.perfil.nome, 'Lucas Marins');
+  assert.equal(dados.perfil.email, 'lucas@exemplo.com');
+  assert.deepEqual(dados.lancamentos, []);
+  assert.deepEqual(dados.dividas, []);
+});
+
+test('obterChaveDadosUsuario e obterChaveOrcamentosUsuario isolam o armazenamento por usuario', () => {
+  // Usuário de demonstração
+  assert.equal(obterChaveDadosUsuario(null), '@meus-custos/dados-demo');
+  assert.equal(obterChaveDadosUsuario('usuario-demo'), '@meus-custos/dados-demo');
+  assert.equal(obterChaveOrcamentosUsuario(null), '@meus_custos:orcamentos_categorias:demo');
+  assert.equal(obterChaveOrcamentosUsuario('usuario-demo'), '@meus_custos:orcamentos_categorias:demo');
+
+  // Usuários reais cadastrados
+  assert.equal(obterChaveDadosUsuario('usr-100'), '@meus-custos/dados-usuario:usr-100');
+  assert.equal(obterChaveDadosUsuario('usr-200'), '@meus-custos/dados-usuario:usr-200');
+  assert.notEqual(obterChaveDadosUsuario('usr-100'), obterChaveDadosUsuario('usr-200'));
+
+  assert.equal(obterChaveOrcamentosUsuario('usr-100'), '@meus_custos:orcamentos_categorias:usr-100');
+  assert.equal(obterChaveOrcamentosUsuario('usr-200'), '@meus_custos:orcamentos_categorias:usr-200');
+  assert.notEqual(obterChaveOrcamentosUsuario('usr-100'), obterChaveOrcamentosUsuario('usr-200'));
 });

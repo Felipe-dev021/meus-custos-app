@@ -10,18 +10,17 @@ import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
 import { useAuth } from '@/contexto/AuthContext';
 import { temErrosLogin, validarCredenciaisLogin, type ErrosLogin } from '@/dominio/validacao-login';
-import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { espacamentos, raios } from '@/tema';
 import { useTema } from '@/tema/ContextoTema';
 
 export default function TelaLogin() {
   const { login, estaAutenticado } = useAuth();
-  const { executar, salvando } = useFinanceiro();
   const { cores } = useTema();
 
   const [email, definirEmail] = useState('');
   const [senha, definirSenha] = useState('');
   const [erros, definirErros] = useState<ErrosLogin>({});
+  const [entrando, definirEntrando] = useState(false);
 
   useEffect(() => {
     if (estaAutenticado) {
@@ -37,16 +36,24 @@ export default function TelaLogin() {
     }
 
     definirErros({});
-    executar({ tipo: 'entrar-demonstracao' });
-    await login(email, senha);
-    router.replace('/');
+    definirEntrando(true);
+    try {
+      await login(email, senha);
+      router.replace('/');
+    } finally {
+      definirEntrando(false);
+    }
   }
 
   async function aoEntrarDemonstracao() {
     definirErros({});
-    executar({ tipo: 'entrar-demonstracao' });
-    await login('demo@exemplo.com');
-    router.replace('/');
+    definirEntrando(true);
+    try {
+      await login('demo@exemplo.com');
+      router.replace('/');
+    } finally {
+      definirEntrando(false);
+    }
   }
 
   function alterarEmail(valor: string) {
@@ -103,7 +110,7 @@ export default function TelaLogin() {
 
         <Botao
           titulo="Entrar"
-          disabled={salvando}
+          disabled={entrando}
           onPress={aoEntrar}
           style={estilos.espacoBotao}
         />
@@ -157,7 +164,7 @@ export default function TelaLogin() {
         <Botao
           titulo="Entrar na demonstração"
           variante="secundaria"
-          disabled={salvando}
+          disabled={entrando}
           onPress={aoEntrarDemonstracao}
         />
       </Cartao>

@@ -21,7 +21,8 @@ Aplicativo mobile de controle financeiro pessoal, desenvolvido com **React Nativ
 - **Consumo de API Externa**: Cotações de moedas em tempo real via AwesomeAPI (`src/servicos/apiCotacoes.ts`).
 - **Despesas e Receitas Recorrentes com Intervalos Flexíveis**: Agendamento de despesas recorrentes (aluguel, assinaturas, parcelamentos) e receitas recorrentes (salários, pró-labore, rendimentos) com intervalos pré-definidos (7, 15, 21 ou 30 dias) ou personalizados em dias livres, com geração automática de parcelas/lançamentos e controle financeiro integrado.
 - **Filtro e Previsão Mensal ('Previsto esse mês')**: Botão dinâmico nas telas de Receitas e Despesas que recalcula e exibe exclusivamente os lançamentos e métricas consolidadas dentro do mês atual civil.
-- **97 Testes Automatizados** (`npm test`) cobrindo 100% das regras financeiras, persistência, sincronização, filtros mensais e recorrências.
+- **Isolamento Completo de Dados por Usuário**: Cada conta possui armazenamento e identificação próprios no `AsyncStorage` e `PostgreSQL`, garantindo que novos cadastros iniciem limpos e contas de teste/demonstração fiquem estritamente isoladas.
+- **99 Testes Automatizados** (`npm test`) cobrindo 100% das regras financeiras, persistência isolada por conta, sincronização, filtros mensais e recorrências.
 
 ---
 
@@ -106,7 +107,7 @@ Para visualizar:
 
 - **Checagem de tipos TypeScript**: `npm run typecheck`
 - **Linter de código**: `npm run lint`
-- **Testes automatizados (97 testes passando)**: `npm test`
+- **Testes automatizados (99 testes passando)**: `npm test`
 
 ---
 

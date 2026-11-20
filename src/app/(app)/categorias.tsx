@@ -19,8 +19,10 @@ import type { CategoriaDespesa } from '@/dominio/financeiro';
 import {
   CHAVE_STORAGE_ORCAMENTOS,
   calcularStatusOrcamentos,
+  obterChaveOrcamentosUsuario,
   type StatusOrcamento,
 } from '@/dominio/orcamentos';
+import { useAuth } from '@/contexto/AuthContext';
 import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { espacamentos, raios } from '@/tema';
 import { useTema } from '@/tema/ContextoTema';
@@ -40,7 +42,10 @@ const ICONES_CATEGORIAS: Record<CategoriaDespesa, keyof typeof Ionicons.glyphMap
 
 export default function TelaCategorias() {
   const { dados } = useFinanceiro();
+  const { usuario } = useAuth();
   const { cores } = useTema();
+
+  const chaveOrcamentos = obterChaveOrcamentosUsuario(usuario?.id);
 
   const [limites, definirLimites] = useState<Partial<Record<CategoriaDespesa, number>>>({});
 
@@ -53,16 +58,18 @@ export default function TelaCategorias() {
   useEffect(() => {
     async function carregarLimitesSalvos() {
       try {
-        const salvos = await AsyncStorage.getItem(CHAVE_STORAGE_ORCAMENTOS);
+        const salvos = await AsyncStorage.getItem(chaveOrcamentos);
         if (salvos) {
           definirLimites(JSON.parse(salvos));
+        } else {
+          definirLimites({});
         }
       } catch (err) {
         console.warn('Erro ao carregar orçamentos do storage:', err);
       }
     }
     carregarLimitesSalvos();
-  }, []);
+  }, [chaveOrcamentos]);
 
   const resumo = calcularStatusOrcamentos(dados.lancamentos, limites);
 
@@ -104,7 +111,7 @@ export default function TelaCategorias() {
     definirLimites(novosLimites);
 
     try {
-      await AsyncStorage.setItem(CHAVE_STORAGE_ORCAMENTOS, JSON.stringify(novosLimites));
+      await AsyncStorage.setItem(chaveOrcamentos, JSON.stringify(novosLimites));
       Alert.alert(
         'Meta Atualizada',
         `Limite de ${categoriaEditando.nomeCategoria} definido para ${formatarMoeda(Math.round(numeroReais * 100))}.`
@@ -128,7 +135,7 @@ export default function TelaCategorias() {
           onPress: async () => {
             definirLimites({});
             try {
-              await AsyncStorage.removeItem(CHAVE_STORAGE_ORCAMENTOS);
+              await AsyncStorage.removeItem(chaveOrcamentos);
               Alert.alert('Sucesso', 'Limites restaurados com sucesso.');
             } catch (err) {
               console.warn('Erro ao limpar orçamentos:', err);

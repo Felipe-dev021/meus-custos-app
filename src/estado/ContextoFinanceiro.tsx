@@ -1,10 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore, type PropsWithChildren } from 'react';
+import { createContext, useContext, useEffect, useMemo, useSyncExternalStore, type PropsWithChildren } from 'react';
 
 import { Botao } from '@/componentes/Botao';
 import { Tela } from '@/componentes/Tela';
 import { Texto } from '@/componentes/Texto';
-import { CHAVE_DADOS } from '@/dados/persistencia';
+import { useAuth } from '@/contexto/AuthContext';
+import { criarDadosDemonstracao, criarDadosVazios } from '@/dados/demonstracao';
+import { obterChaveDadosUsuario } from '@/dados/persistencia';
 
 import {
   calcularGastosPorCategoria,
@@ -19,21 +21,48 @@ import { criarEstadoFinanceiro } from '@/estado/estado-financeiro';
 const ContextoFinanceiro = createContext<ReturnType<typeof criarEstadoFinanceiro> | null>(null);
 
 export function ProvedorFinanceiro({ children }: PropsWithChildren) {
-  const [central] = useState(() => criarEstadoFinanceiro(undefined, {
-    ler: () => AsyncStorage.getItem(CHAVE_DADOS),
-    gravar: (conteudo) => AsyncStorage.setItem(CHAVE_DADOS, conteudo),
-  }));
+  const { usuario } = useAuth();
+  const usuarioId = usuario?.id ?? null;
+  const ehDemo = !usuario || usuario.email === 'demo@exemplo.com' || usuario.id === 'usuario-demo';
+
+  const central = useMemo(() => {
+    const chave = obterChaveDadosUsuario(usuarioId);
+    const dadosIniciais = ehDemo
+      ? criarDadosDemonstracao()
+      : criarDadosVazios({ nome: usuario?.nome, email: usuario?.email });
+
+    return criarEstadoFinanceiro(dadosIniciais, {
+      ler: () => AsyncStorage.getItem(chave),
+      gravar: (conteudo) => AsyncStorage.setItem(chave, conteudo),
+    });
+  }, [usuarioId, ehDemo, usuario?.nome, usuario?.email]);
+
   const estado = useSyncExternalStore(central.assinar, central.obterEstado, central.obterEstado);
-  useEffect(() => { void central.iniciar(); }, [central]);
+
+  useEffect(() => {
+    async function inicializar() {
+      await central.iniciar();
+      if (usuarioId || ehDemo) {
+        central.executar({ tipo: 'entrar-demonstracao' });
+      }
+    }
+    void inicializar();
+  }, [central, usuarioId, ehDemo]);
 
   if (!estado.carregado || estado.erroArmazenamento) {
     return (
       <Tela>
-        <Texto variante="subtitulo">{estado.erroArmazenamento ? 'Precisamos tentar novamente' : 'Carregando sua demonstração…'}</Texto>
-        {estado.erroArmazenamento && <>
-          <Texto tom="secundaria" accessibilityLiveRegion="polite">{estado.erroArmazenamento}</Texto>
-          <Botao titulo="Tentar novamente" onPress={() => { void central.tentarNovamente(); }} />
-        </>}
+        <Texto variante="subtitulo">
+          {estado.erroArmazenamento ? 'Precisamos tentar novamente' : 'Carregando suas finanças…'}
+        </Texto>
+        {estado.erroArmazenamento && (
+          <>
+            <Texto tom="secundaria" accessibilityLiveRegion="polite">
+              {estado.erroArmazenamento}
+            </Texto>
+            <Botao titulo="Tentar novamente" onPress={() => { void central.tentarNovamente(); }} />
+          </>
+        )}
       </Tela>
     );
   }

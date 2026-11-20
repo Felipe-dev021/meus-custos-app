@@ -14,12 +14,11 @@ import {
   validarCamposRegistro,
   type ErrosRegistro,
 } from '@/dominio/validacao-registro';
-import { useFinanceiro } from '@/estado/ContextoFinanceiro';
 import { espacamentos } from '@/tema';
 
 export default function TelaRegistro() {
   const { cadastrar, estaAutenticado } = useAuth();
-  const { executar, salvando } = useFinanceiro();
+  const [cadastrando, definirCadastrando] = useState(false);
 
   const [nome, definirNome] = useState('');
   const [email, definirEmail] = useState('');
@@ -41,17 +40,13 @@ export default function TelaRegistro() {
     }
 
     definirErros({});
-    executar({ tipo: 'entrar-demonstracao' });
-    executar({
-      tipo: 'atualizar-perfil',
-      perfil: {
-        nome: nome.trim(),
-        email: email.trim(),
-      },
-    });
-
-    await cadastrar(nome, email, senha);
-    router.replace('/');
+    definirCadastrando(true);
+    try {
+      await cadastrar(nome, email, senha);
+      router.replace('/');
+    } finally {
+      definirCadastrando(false);
+    }
   }
 
   function alterarNome(valor: string) {
@@ -142,7 +137,7 @@ export default function TelaRegistro() {
 
         <Botao
           titulo="Cadastrar e entrar"
-          disabled={salvando}
+          disabled={cadastrando}
           onPress={aoCadastrar}
           style={estilos.espacoBotao}
         />

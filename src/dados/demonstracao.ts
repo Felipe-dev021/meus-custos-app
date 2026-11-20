@@ -1,5 +1,17 @@
-import type { DadosFinanceiros, DataCivil } from '../dominio/financeiro';
+import type { DadosFinanceiros, DataCivil, Perfil } from '../dominio/financeiro';
 import { paraDataCivil } from '../utilitarios/formatacao.ts';
+
+/** Retorna uma estrutura financeira limpa sem lançamentos ou dívidas para novas contas. */
+export function criarDadosVazios(perfil?: Partial<Perfil>): DadosFinanceiros {
+  return {
+    perfil: {
+      nome: perfil?.nome?.trim() || 'Usuário',
+      email: perfil?.email?.trim() || '',
+    },
+    lancamentos: [],
+    dividas: [],
+  };
+}
 
 /** Criar apenas ao iniciar os dados da demonstração, nunca a cada renderização. */
 export function criarDadosDemonstracao(dataReferencia = new Date()): DadosFinanceiros {

@@ -3,6 +3,14 @@ import type { CategoriaDespesa, Lancamento } from './financeiro.ts';
 
 export const CHAVE_STORAGE_ORCAMENTOS = '@meus_custos:orcamentos_categorias';
 
+/** Retorna a chave de armazenamento de orçamentos isolada por usuário */
+export function obterChaveOrcamentosUsuario(usuarioId?: string | null): string {
+  if (!usuarioId || usuarioId === 'usuario-demo' || usuarioId === 'demo') {
+    return '@meus_custos:orcamentos_categorias:demo';
+  }
+  return `@meus_custos:orcamentos_categorias:${usuarioId}`;
+}
+
 export interface OrcamentoCategoria {
   categoria: CategoriaDespesa;
   limiteCentavos: number;

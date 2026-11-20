@@ -5,6 +5,14 @@ import { ehDataCivil } from '../utilitarios/formatacao.ts';
 
 export const CHAVE_DADOS = '@meus-custos/dados-v1';
 
+/** Retorna a chave de armazenamento isolada por usuário */
+export function obterChaveDadosUsuario(usuarioId?: string | null): string {
+  if (!usuarioId || usuarioId === 'usuario-demo' || usuarioId === 'demo') {
+    return '@meus-custos/dados-demo';
+  }
+  return `@meus-custos/dados-usuario:${usuarioId}`;
+}
+
 export type ArmazenamentoFinanceiro = {
   ler: () => Promise<string | null>;
   gravar: (conteudo: string) => Promise<void>;

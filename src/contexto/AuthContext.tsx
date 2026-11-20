@@ -1,7 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
+import { criarDadosVazios } from '../dados/demonstracao.ts';
+import { obterChaveDadosUsuario } from '../dados/persistencia.ts';
+import { obterChaveOrcamentosUsuario } from '../dominio/orcamentos.ts';
 import { apiLogin, apiRegistro } from '../servicos/apiBackend.ts';
-import { sincronizarComNuvem } from '../servicos/sincronizacao.ts';
+import { restaurarDadosDaNuvem, sincronizarComNuvem } from '../servicos/sincronizacao.ts';
 
 export interface Usuario {
   id: string;
@@ -60,31 +63,43 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   async function login(email?: string, senha?: string) {
     const emailLimpo = email?.trim() || 'demo@exemplo.com';
+    const ehDemo = emailLimpo === 'demo@exemplo.com';
     const parteNome = emailLimpo.split('@')[0] || 'Usuário';
-    const nomeFormatado = parteNome.charAt(0).toUpperCase() + parteNome.slice(1);
+    const nomeFormatado = ehDemo ? 'Usuário Demonstração' : (parteNome.charAt(0).toUpperCase() + parteNome.slice(1));
 
     let novoUsuario: Usuario = {
-      id: 'usuario-' + Date.now(),
+      id: ehDemo ? 'usuario-demo' : ('usuario-' + Date.now()),
       nome: nomeFormatado,
       email: emailLimpo,
     };
 
-    try {
-      const resposta = await apiLogin(emailLimpo, senha);
-      if (resposta?.usuario) {
-        novoUsuario = {
-          id: resposta.usuario.id,
-          nome: resposta.usuario.nome,
-          email: resposta.usuario.email,
-        };
+    if (!ehDemo) {
+      try {
+        const resposta = await apiLogin(emailLimpo, senha);
+        if (resposta?.usuario) {
+          novoUsuario = {
+            id: resposta.usuario.id,
+            nome: resposta.usuario.nome,
+            email: resposta.usuario.email,
+          };
+        }
+      } catch {
+        // Fallback seguro para modo offline quando a API estiver indisponível
       }
-    } catch {
-      // Fallback seguro para modo offline quando a API estiver indisponível
     }
 
     definirUsuario(novoUsuario);
     await AsyncStorage.setItem(CHAVE_AUTENTICACAO, JSON.stringify(novoUsuario));
-    void sincronizarComNuvem(novoUsuario.id);
+
+    if (!ehDemo) {
+      // Se não tiver dados locais deste usuário, tenta restaurar dados da nuvem
+      const chaveUsuario = obterChaveDadosUsuario(novoUsuario.id);
+      const dadosLocais = await AsyncStorage.getItem(chaveUsuario);
+      if (!dadosLocais) {
+        await restaurarDadosDaNuvem(novoUsuario.id);
+      }
+      void sincronizarComNuvem(novoUsuario.id);
+    }
   }
 
   async function cadastrar(nome: string, email: string, senha?: string) {
@@ -109,6 +124,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     } catch {
       // Fallback seguro para modo offline quando a API estiver indisponível
     }
+
+    // Inicializa a nova conta com dados vazios e isolados, sem herdar a conta de teste
+    const chaveUsuario = obterChaveDadosUsuario(novoUsuario.id);
+    const dadosIniciais = criarDadosVazios({ nome: nomeLimpo, email: emailLimpo });
+    await AsyncStorage.setItem(chaveUsuario, JSON.stringify(dadosIniciais));
+
+    const chaveOrcamentos = obterChaveOrcamentosUsuario(novoUsuario.id);
+    await AsyncStorage.setItem(chaveOrcamentos, JSON.stringify({}));
 
     definirUsuario(novoUsuario);
     await AsyncStorage.setItem(CHAVE_AUTENTICACAO, JSON.stringify(novoUsuario));
