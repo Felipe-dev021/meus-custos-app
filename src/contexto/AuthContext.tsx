@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 import { criarDadosVazios } from '../dados/demonstracao.ts';
-import { obterChaveDadosUsuario } from '../dados/persistencia.ts';
+import { obterChaveDadosUsuario, serializarDados } from '../dados/persistencia.ts';
 import { obterChaveOrcamentosUsuario } from '../dominio/orcamentos.ts';
 import { apiLogin, apiRegistro } from '../servicos/apiBackend.ts';
 import { restaurarDadosDaNuvem, sincronizarComNuvem } from '../servicos/sincronizacao.ts';
@@ -128,7 +128,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     // Inicializa a nova conta com dados vazios e isolados, sem herdar a conta de teste
     const chaveUsuario = obterChaveDadosUsuario(novoUsuario.id);
     const dadosIniciais = criarDadosVazios({ nome: nomeLimpo, email: emailLimpo });
-    await AsyncStorage.setItem(chaveUsuario, JSON.stringify(dadosIniciais));
+    await AsyncStorage.setItem(chaveUsuario, serializarDados(dadosIniciais));
 
     const chaveOrcamentos = obterChaveOrcamentosUsuario(novoUsuario.id);
     await AsyncStorage.setItem(chaveOrcamentos, JSON.stringify({}));

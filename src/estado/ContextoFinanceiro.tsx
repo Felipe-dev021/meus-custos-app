@@ -40,13 +40,21 @@ export function ProvedorFinanceiro({ children }: PropsWithChildren) {
   const estado = useSyncExternalStore(central.assinar, central.obterEstado, central.obterEstado);
 
   useEffect(() => {
+    let cancelado = false;
     async function inicializar() {
       await central.iniciar();
-      if (usuarioId || ehDemo) {
-        central.executar({ tipo: 'entrar-demonstracao' });
+      if (!cancelado && central.obterEstado().carregado && !central.obterEstado().demonstracaoAtiva) {
+        try {
+          central.executar({ tipo: 'entrar-demonstracao' });
+        } catch {
+          // Preserva o estado caso já tenha sido ativado ou cancelado
+        }
       }
     }
     void inicializar();
+    return () => {
+      cancelado = true;
+    };
   }, [central, usuarioId, ehDemo]);
 
   if (!estado.carregado || estado.erroArmazenamento) {
@@ -60,7 +68,20 @@ export function ProvedorFinanceiro({ children }: PropsWithChildren) {
             <Texto tom="secundaria" accessibilityLiveRegion="polite">
               {estado.erroArmazenamento}
             </Texto>
-            <Botao titulo="Tentar novamente" onPress={() => { void central.tentarNovamente(); }} />
+            <Botao
+              titulo="Tentar novamente"
+              onPress={() => {
+                void central.tentarNovamente().then(() => {
+                  if (central.obterEstado().carregado && !central.obterEstado().demonstracaoAtiva) {
+                    try {
+                      central.executar({ tipo: 'entrar-demonstracao' });
+                    } catch {
+                      // Silencia erro se já estiver ativo
+                    }
+                  }
+                });
+              }}
+            />
           </>
         )}
       </Tela>

@@ -132,6 +132,12 @@ export function serializarDados(dados: DadosFinanceiros): string {
 
 export function restaurarDados(conteudo: string): DadosFinanceiros {
   const registro = objeto(JSON.parse(conteudo));
+  if (registro.versao === 1 && registro.dados) {
+    return validarDados(registro.dados);
+  }
+  if (registro.perfil && Array.isArray(registro.lancamentos) && Array.isArray(registro.dividas)) {
+    return validarDados(registro);
+  }
   exigir(registro.versao === 1);
   return validarDados(registro.dados);
 }

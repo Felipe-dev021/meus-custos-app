@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CHAVE_DADOS, obterChaveDadosUsuario } from '../dados/persistencia.ts';
+import { CHAVE_DADOS, obterChaveDadosUsuario, restaurarDados, serializarDados } from '../dados/persistencia.ts';
 import type { DadosFinanceiros } from '../dominio/financeiro.ts';
 import { CHAVE_STORAGE_ORCAMENTOS, obterChaveOrcamentosUsuario } from '../dominio/orcamentos.ts';
 import {
@@ -39,7 +39,14 @@ export async function sincronizarComNuvem(usuarioId: string): Promise<StatusSinc
   try {
     const chaveUsuario = obterChaveDadosUsuario(usuarioId);
     const dadosArmazenadosRaw = await AsyncStorage.getItem(chaveUsuario);
-    const dadosFinanceiros: DadosFinanceiros | null = dadosArmazenadosRaw ? JSON.parse(dadosArmazenadosRaw) : null;
+    let dadosFinanceiros: DadosFinanceiros | null = null;
+    if (dadosArmazenadosRaw) {
+      try {
+        dadosFinanceiros = restaurarDados(dadosArmazenadosRaw);
+      } catch {
+        dadosFinanceiros = null;
+      }
+    }
 
     const chaveOrcamentos = obterChaveOrcamentosUsuario(usuarioId);
     const orcamentosRaw = await AsyncStorage.getItem(chaveOrcamentos);
@@ -82,7 +89,7 @@ export async function restaurarDadosDaNuvem(usuarioId: string): Promise<boolean>
     };
 
     const chaveUsuario = obterChaveDadosUsuario(usuarioId);
-    await AsyncStorage.setItem(chaveUsuario, JSON.stringify(dadosLocais));
+    await AsyncStorage.setItem(chaveUsuario, serializarDados(dadosLocais));
 
     if (dadosRemotos.orcamentos && Array.isArray(dadosRemotos.orcamentos)) {
       const mapaOrcamentos: Record<string, number> = {};

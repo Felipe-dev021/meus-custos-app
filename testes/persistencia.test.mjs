@@ -188,3 +188,14 @@ test('obterChaveDadosUsuario e obterChaveOrcamentosUsuario isolam o armazenament
   assert.equal(obterChaveOrcamentosUsuario('usr-200'), '@meus_custos:orcamentos_categorias:usr-200');
   assert.notEqual(obterChaveOrcamentosUsuario('usr-100'), obterChaveOrcamentosUsuario('usr-200'));
 });
+
+test('restaurarDados restaura com sucesso dados envelopados com versao ou dados diretos legados', () => {
+  const dados = criarDadosVazios({ nome: 'Felipe Dev', email: 'felipe@exemplo.com' });
+  const serializadoComVersao = serializarDados(dados);
+  const restauradoEnvelope = restaurarDados(serializadoComVersao);
+  assert.deepEqual(restauradoEnvelope, dados);
+
+  const jsonDiretoSemEnvelope = JSON.stringify(dados);
+  const restauradoDireto = restaurarDados(jsonDiretoSemEnvelope);
+  assert.deepEqual(restauradoDireto, dados);
+});
